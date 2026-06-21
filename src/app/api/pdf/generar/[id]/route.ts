@@ -85,13 +85,13 @@ export async function GET(
         // ── Correr orquestador ──
         const result = await runOrchestrator(
           {
-            context:         proyecto.contexto,
-            numChapters:     proyecto.num_capitulos ?? 5,
-            tono:            proyecto.tono ?? "profesional",
-            modelStr:        proyecto.modelo_ia ?? "gemini:gemini-2.0-flash",
-            generateImages:  proyecto.incluir_imagenes ?? true,
+            context:        proyecto.contexto,
+            numChapters:    proyecto.num_capitulos ?? 5,
+            tono:           proyecto.tono ?? "profesional",
+            calidad:        (proyecto.calidad ?? "estandar") as "estandar" | "avanzado" | "premium",
+            generateImages: proyecto.incluir_imagenes ?? true,
             brand,
-            projectId:       proyectoId,
+            projectId:      proyectoId,
           },
           async (event) => {
             emit(event);

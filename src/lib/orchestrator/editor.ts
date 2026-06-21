@@ -21,7 +21,8 @@ Responde en formato XML suave:
 Si una sección está bien, repite su título/subtítulo sin cambios.
 Si hay un duplicado, modifica el SEGUNDO para que sea distinto.`;
 
-export async function runEditor(sections: Section[], modelStr: string): Promise<Section[]> {
+export async function runEditor(sections: Section[], editorModel: string): Promise<Section[]> {
+  const modelStr = editorModel;
   // Primero deduplicar por título exacto
   let deduped = deduplicateSections(sections);
 

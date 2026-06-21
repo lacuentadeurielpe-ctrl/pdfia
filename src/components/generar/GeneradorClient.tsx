@@ -8,7 +8,7 @@ interface Proyecto {
   titulo: string;
   contexto: string;
   estado: string;
-  modelo_ia: string;
+  calidad: string;
   num_capitulos: number;
   tono: string;
   incluir_imagenes: boolean;
@@ -115,8 +115,8 @@ export default function GeneradorClient({
           <h1 className="text-2xl font-bold text-white">{pdfTitulo || proyecto.titulo}</h1>
         </div>
         <p className="text-gray-400 text-sm ml-8">
-          {proyecto.num_capitulos} capítulos · {proyecto.modelo_ia} · tono {proyecto.tono}
-          {proyecto.incluir_imagenes ? " · imágenes IA activadas" : ""}
+          {proyecto.num_capitulos} capítulos · calidad {proyecto.calidad ?? "estándar"} · tono {proyecto.tono}
+          {proyecto.incluir_imagenes ? " · imágenes IA" : ""}
         </p>
       </div>
 

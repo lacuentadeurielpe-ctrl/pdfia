@@ -1,14 +1,37 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Image, BookOpen, Mic2 } from "lucide-react";
+import { Sparkles, Image, BookOpen, Mic2, Zap, Star, Crown } from "lucide-react";
 
-const MODELOS = [
-  { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash", desc: "Rápido y eficiente", badge: "Recomendado" },
-  { id: "gemini-2.5-pro",   label: "Gemini 2.5 Pro",   desc: "Mayor razonamiento", badge: "Premium" },
-  { id: "deepseek-chat",    label: "DeepSeek Chat",    desc: "Muy económico",      badge: "Barato" },
-  { id: "claude-sonnet-4-6",label: "Claude Sonnet",    desc: "Alta calidad",       badge: "Potente" },
-];
+const CALIDADES = [
+  {
+    id:    "estandar",
+    label: "Estándar",
+    desc:  "Rápido y de excelente calidad. Ideal para la mayoría de proyectos.",
+    icon:  Zap,
+    badge: "Recomendado",
+    time:  "~3-5 min",
+    color: "indigo",
+  },
+  {
+    id:    "avanzado",
+    label: "Avanzado",
+    desc:  "Mayor profundidad, más ejemplos reales y análisis detallado.",
+    icon:  Star,
+    badge: "Popular",
+    time:  "~6-10 min",
+    color: "purple",
+  },
+  {
+    id:    "premium",
+    label: "Premium",
+    desc:  "Máxima profundidad. Ideal para ebooks de ventas o contenido educativo denso.",
+    icon:  Crown,
+    badge: "Pro",
+    time:  "~12-20 min",
+    color: "amber",
+  },
+] as const;
 
 const TONOS = ["profesional", "educativo", "creativo", "técnico", "divulgativo", "motivacional"];
 
@@ -16,7 +39,7 @@ export default function CrearPDFForm() {
   const router = useRouter();
   const [contexto, setContexto] = useState("");
   const [titulo, setTitulo] = useState("");
-  const [modelo, setModelo] = useState("gemini-2.5-flash");
+  const [calidad, setCalidad] = useState<"estandar" | "avanzado" | "premium">("estandar");
   const [capitulos, setCapitulos] = useState(5);
   const [tono, setTono] = useState("profesional");
   const [incluirImagenes, setIncluirImagenes] = useState(true);
@@ -32,7 +55,7 @@ export default function CrearPDFForm() {
       const res = await fetch("/api/pdf/crear", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titulo, contexto, modelo, capitulos, tono, incluirImagenes }),
+        body: JSON.stringify({ titulo, contexto, calidad, capitulos, tono, incluirImagenes }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al iniciar la generación");
@@ -83,33 +106,47 @@ export default function CrearPDFForm() {
         />
       </div>
 
-      {/* Modelo IA */}
+      {/* Calidad */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <label className="block text-white font-semibold mb-4">Modelo de IA para el texto</label>
-        <div className="grid grid-cols-2 gap-3">
-          {MODELOS.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => setModelo(m.id)}
-              className={`text-left p-4 rounded-xl border transition-colors ${
-                modelo === m.id
-                  ? "border-indigo-500 bg-indigo-600/10"
-                  : "border-gray-700 hover:border-gray-600 bg-gray-800"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-white font-medium text-sm">{m.label}</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  m.badge === "Recomendado" ? "bg-indigo-600/30 text-indigo-300" :
-                  m.badge === "Premium"     ? "bg-purple-600/30 text-purple-300" :
-                  m.badge === "Barato"      ? "bg-emerald-600/30 text-emerald-300" :
-                                              "bg-orange-600/30 text-orange-300"
-                }`}>{m.badge}</span>
-              </div>
-              <p className="text-gray-500 text-xs">{m.desc}</p>
-            </button>
-          ))}
+        <label className="block text-white font-semibold mb-1">Calidad del documento</label>
+        <p className="text-gray-500 text-xs mb-4">
+          Todos los niveles producen contenido profesional. Mayor calidad = más profundidad y tiempo.
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          {CALIDADES.map((c) => {
+            const Icon = c.icon;
+            const selected = calidad === c.id;
+            const colorMap = {
+              indigo: { border: "border-indigo-500 bg-indigo-600/10", badge: "bg-indigo-600/30 text-indigo-300", icon: "text-indigo-400" },
+              purple: { border: "border-purple-500 bg-purple-600/10", badge: "bg-purple-600/30 text-purple-300", icon: "text-purple-400" },
+              amber:  { border: "border-amber-500  bg-amber-600/10",  badge: "bg-amber-600/30  text-amber-300",  icon: "text-amber-400"  },
+            };
+            const colors = colorMap[c.color];
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setCalidad(c.id)}
+                className={`text-left p-4 rounded-xl border transition-colors ${
+                  selected ? colors.border : "border-gray-700 hover:border-gray-600 bg-gray-800"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <Icon className={`w-4 h-4 ${selected ? colors.icon : "text-gray-500"}`} />
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    selected ? colors.badge : "bg-gray-700 text-gray-400"
+                  }`}>{c.badge}</span>
+                </div>
+                <p className="text-white font-semibold text-sm mb-1">{c.label}</p>
+                <p className="text-gray-500 text-xs leading-relaxed">{c.desc}</p>
+                <p className={`text-xs mt-2 font-medium ${selected ? colors.icon : "text-gray-600"}`}>{c.time}</p>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-3 bg-gray-800 rounded-xl px-4 py-3 text-xs text-gray-400">
+          <span className="text-white font-medium">Motor multi-IA:</span>{" "}
+          Claude (planificación) · DeepSeek (redacción) · Gemini (imágenes)
         </div>
       </div>
 
@@ -128,6 +165,7 @@ export default function CrearPDFForm() {
                 className="flex-1 accent-indigo-500" />
               <span className="text-white font-bold w-6 text-center">{capitulos}</span>
             </div>
+            <p className="text-xs text-gray-600 mt-1">Cada capítulo: 1–7 páginas (el agente decide)</p>
           </div>
           <div>
             <label className="block text-sm text-gray-400 mb-2">
@@ -156,7 +194,7 @@ export default function CrearPDFForm() {
             <div>
               <p className="text-white font-semibold text-sm">Imágenes generadas por IA</p>
               <p className="text-gray-500 text-xs">
-                El director decidirá qué modelo usar según la complejidad de cada sección
+                Gemini generará una imagen por capítulo que lo necesite
               </p>
             </div>
           </div>
@@ -172,14 +210,6 @@ export default function CrearPDFForm() {
             }`} />
           </button>
         </div>
-        {incluirImagenes && (
-          <div className="mt-4 bg-gray-800 rounded-xl p-3 text-xs text-gray-400">
-            <span className="text-yellow-400 font-semibold">Director IA:</span>{" "}
-            Usará <span className="text-white">gemini-2.5-flash-preview-image-generation</span> por defecto.
-            Para secciones con datos o gráficos precisos, escalará a{" "}
-            <span className="text-white">gemini-3-pro-image</span> automáticamente.
-          </div>
-        )}
       </div>
 
       {error && (
@@ -196,7 +226,7 @@ export default function CrearPDFForm() {
                    py-4 rounded-2xl transition-colors text-base"
       >
         <Sparkles className="w-5 h-5" />
-        {loading ? "Iniciando orquestador..." : "Generar PDF con IA"}
+        {loading ? "Iniciando orquestador..." : "Generar ebook con IA"}
       </button>
     </form>
   );

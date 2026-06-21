@@ -4,6 +4,52 @@ import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export type ModelProvider = "gemini" | "deepseek" | "claude" | "openai";
+export type Calidad = "estandar" | "avanzado" | "premium";
+
+export interface QualityModels {
+  director: string;          // Claude — razonamiento y planificación
+  writer: string;            // DeepSeek — redacción económica de alta calidad
+  integrator: string;        // Claude — revisión y expansión de capítulos
+  editor: string;            // Claude — revisión global final
+  writerMaxTokens: number;
+  integratorMaxTokens: number;
+  researcherMaxTokens: number;
+}
+
+export function getQualityModels(calidad: Calidad): QualityModels {
+  switch (calidad) {
+    case "premium":
+      return {
+        director:              "claude-opus-4-8",
+        writer:                "deepseek-chat",
+        integrator:            "claude-opus-4-8",
+        editor:                "claude-sonnet-4-6",
+        writerMaxTokens:       8000,
+        integratorMaxTokens:   6000,
+        researcherMaxTokens:   2500,
+      };
+    case "avanzado":
+      return {
+        director:              "claude-sonnet-4-6",
+        writer:                "deepseek-chat",
+        integrator:            "claude-sonnet-4-6",
+        editor:                "claude-haiku-4-5-20251001",
+        writerMaxTokens:       6000,
+        integratorMaxTokens:   4000,
+        researcherMaxTokens:   2000,
+      };
+    default: // estandar
+      return {
+        director:              "claude-haiku-4-5-20251001",
+        writer:                "deepseek-chat",
+        integrator:            "claude-haiku-4-5-20251001",
+        editor:                "claude-haiku-4-5-20251001",
+        writerMaxTokens:       4000,
+        integratorMaxTokens:   3000,
+        researcherMaxTokens:   1500,
+      };
+  }
+}
 
 export function parseModelConfig(modelStr: string): { provider: ModelProvider; modelId: string } {
   if (modelStr.startsWith("gemini"))    return { provider: "gemini",   modelId: modelStr };

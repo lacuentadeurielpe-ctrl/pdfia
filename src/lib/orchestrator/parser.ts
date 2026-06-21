@@ -10,6 +10,20 @@ export interface SectionOutline {
   keyPoints: string[];
   imageNeeded: boolean;
   imageComplexity: ImageComplexity;
+  targetPages: number; // 1-7, decidido por el Director
+}
+
+export interface BookContext {
+  bookTitle: string;
+  bookSubtitle: string;
+  tone: string;
+  style: string;
+  allChapterTitles: string[];
+  completedChapters: {
+    order: number;
+    title: string;
+    summary: string; // breve resumen de lo cubierto
+  }[];
 }
 
 export interface Outline {
@@ -74,6 +88,8 @@ export function parseOutline(text: string): Outline {
       .split("\n")
       .map((l) => l.replace(/^[-•*\d.]\s*/, "").trim())
       .filter(Boolean);
+    const rawPages = parseInt(extractTag(block, "target_pages") || "2");
+    const targetPages = isNaN(rawPages) ? 2 : Math.min(7, Math.max(1, rawPages));
     return {
       order:           i,
       title:           extractTag(block, "title")            || `Capítulo ${i + 1}`,
@@ -82,6 +98,7 @@ export function parseOutline(text: string): Outline {
       keyPoints,
       imageNeeded:     extractTag(block, "image_needed")     !== "false",
       imageComplexity: toComplexity(extractTag(block, "image_complexity") || "simple"),
+      targetPages,
     };
   });
 

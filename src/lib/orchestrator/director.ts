@@ -9,13 +9,17 @@ REGLAS CRÍTICAS:
 - EXACTAMENTE UN título de libro (<book_title>) — nunca repetido en las secciones
 - Cada sección tiene UN título único y UN subtítulo único — NINGUNO se repite entre secciones
 - Los títulos de secciones NO pueden ser variaciones del título principal
+- Para cada sección, decide cuántas páginas necesita (target_pages entre 1 y 7):
+  * Introducción y conclusión: 2-3 páginas
+  * Capítulos de contenido denso (conceptos, marcos, metodologías): 4-6 páginas
+  * Capítulos de ejemplos o casos prácticos: 3-5 páginas
+  * El agente escritor respetará este target
 - Decide qué tan compleja es la imagen de cada sección:
-  * none → sección puramente textual, no necesita imagen
-  * simple → ilustración decorativa o conceptual (usa modelo barato)
+  * none → sección puramente textual
+  * simple → ilustración decorativa o conceptual
   * complex → escena elaborada con múltiples elementos
-  * data → gráfico, chart, infografía con datos reales del documento
-  * technical → diagrama técnico, flujo de proceso, arquitectura (usa modelo caro)
-- Las secciones de datos/technical usarán el modelo de imagen más potente automáticamente
+  * data → gráfico, chart, infografía con datos reales
+  * technical → diagrama técnico, flujo de proceso, arquitectura
 - Diseña un arco narrativo: introducción → desarrollo → ejemplos → casos → conclusión
 
 USA ESTE FORMATO EXACTO (etiquetas XML suaves):
@@ -34,6 +38,7 @@ USA ESTE FORMATO EXACTO (etiquetas XML suaves):
 - Punto clave 2 a cubrir
 - Punto clave 3 a cubrir
 </key_points>
+<target_pages>3</target_pages>
 <image_needed>true</image_needed>
 <image_complexity>simple</image_complexity>
 </section>
@@ -44,7 +49,7 @@ export async function runDirector(
   context: string,
   numChapters: number,
   tono: string,
-  modelStr: string
+  directorModel: string
 ): Promise<Outline> {
   const userPrompt = `
 Contexto del documento a crear:
@@ -57,8 +62,9 @@ Tono deseado: ${tono}
 
 Crea el outline maestro completo. Asegúrate que cada capítulo aporte valor único y no se solape con los demás.
 El primer capítulo debe ser una introducción poderosa y el último debe cerrar con conclusiones y próximos pasos.
+Decide el número de páginas de cada capítulo según su densidad de contenido (1-7 páginas).
 `;
 
-  const raw = await callTextModel(modelStr, DIRECTOR_SYSTEM, userPrompt, 4000);
+  const raw = await callTextModel(directorModel, DIRECTOR_SYSTEM, userPrompt, 4000);
   return parseOutline(raw);
 }
