@@ -36,6 +36,29 @@ export async function GET() {
     return NextResponse.json(result, { status: 200 });
   }
 
+  // Preguntar a Google qué modelos tiene disponibles ESTA key, y cuáles soportan imágenes
+  try {
+    const listRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=200`
+    );
+    const listJson = await listRes.json();
+    if (Array.isArray(listJson.models)) {
+      result.modelosDisponibles = listJson.models
+        .map((m: { name?: string; supportedGenerationMethods?: string[] }) => ({
+          name: m.name,
+          methods: m.supportedGenerationMethods,
+        }))
+        .filter((m: { name?: string }) =>
+          /image|imagen|flash|nano/i.test(m.name ?? "")
+        );
+      result.totalModelos = listJson.models.length;
+    } else {
+      result.listModelsError = listJson;
+    }
+  } catch (e) {
+    result.listModelsError = e instanceof Error ? e.message : String(e);
+  }
+
   const ai = new GoogleGenAI({ apiKey });
   const modelos = result.modelos as Record<string, unknown>;
 
