@@ -168,8 +168,8 @@ export async function GET(
           message: `🎉 ¡"${result.outline.bookTitle}" listo! Ábrelo y usa Ctrl+P → Guardar como PDF`,
           progress: 100,
           data: {
-            pdfUrl:   docUrl,
-            titulo:   result.outline.bookTitle,
+            pdfUrl:    `/preview/${proyectoId}`,   // ruta Next.js que sirve el HTML correctamente
+            titulo:    result.outline.bookTitle,
             secciones: result.sections.length,
             imagenes:  imagesCount,
             bytes:     htmlBytes.length,

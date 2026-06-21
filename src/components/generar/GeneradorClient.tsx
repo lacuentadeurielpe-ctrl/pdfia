@@ -31,12 +31,18 @@ const FASES = [
 
 const FASE_ORDER = FASES.map((f) => f.key);
 
-export default function GeneradorClient({ proyecto }: { proyecto: Proyecto }) {
+export default function GeneradorClient({
+  proyecto,
+  previewUrl,
+}: {
+  proyecto: Proyecto;
+  previewUrl?: string | null;
+}) {
   const router = useRouter();
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [phase, setPhase] = useState<string>(proyecto.estado);
-  const [progress, setProgress] = useState(0);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [progress, setProgress] = useState(proyecto.estado === "completado" ? 100 : 0);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(previewUrl ?? null);
   const [pdfTitulo, setPdfTitulo] = useState<string>(proyecto.titulo || "");
   const [iniciado, setIniciado] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);

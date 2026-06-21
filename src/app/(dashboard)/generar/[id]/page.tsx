@@ -16,5 +16,10 @@ export default async function GenerarPage({ params }: { params: Promise<{ id: st
 
   if (!proyecto) redirect("/crear");
 
-  return <GeneradorClient proyecto={proyecto} />;
+  // Si ya está completado, cargamos la URL del preview directamente
+  const previewUrl = proyecto.estado === "completado"
+    ? `/preview/${id}`
+    : null;
+
+  return <GeneradorClient proyecto={proyecto} previewUrl={previewUrl} />;
 }
