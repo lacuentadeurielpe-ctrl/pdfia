@@ -7,29 +7,32 @@ const CALIDADES = [
   {
     id:    "estandar",
     label: "Estándar",
-    desc:  "Rápido y de excelente calidad. Ideal para la mayoría de proyectos.",
+    desc:  "Claude planifica, DeepSeek escribe. Excelente calidad. Recomendado para la mayoría.",
     icon:  Zap,
     badge: "Recomendado",
     time:  "~3-5 min",
     color: "indigo",
+    agents: "Director + Escritor",
   },
   {
     id:    "avanzado",
     label: "Avanzado",
-    desc:  "Mayor profundidad, más ejemplos reales y análisis detallado.",
+    desc:  "Agente investigador por capítulo. Más ejemplos reales, datos y casos prácticos.",
     icon:  Star,
     badge: "Popular",
-    time:  "~6-10 min",
+    time:  "~6-9 min",
     color: "purple",
+    agents: "Director + Investigador + Escritor",
   },
   {
     id:    "premium",
     label: "Premium",
-    desc:  "Máxima profundidad. Ideal para ebooks de ventas o contenido educativo denso.",
+    desc:  "Pipeline completo. Claude Opus revisa y expande cada capítulo hasta profundidad máxima.",
     icon:  Crown,
     badge: "Pro",
-    time:  "~12-20 min",
+    time:  "~10-15 min",
     color: "amber",
+    agents: "Director + Investigador + Escritor + Revisor",
   },
 ] as const;
 
@@ -139,7 +142,7 @@ export default function CrearPDFForm() {
                 </div>
                 <p className="text-white font-semibold text-sm mb-1">{c.label}</p>
                 <p className="text-gray-500 text-xs leading-relaxed">{c.desc}</p>
-                <p className={`text-xs mt-2 font-medium ${selected ? colors.icon : "text-gray-600"}`}>{c.time}</p>
+                <p className={`text-xs mt-2 font-medium ${selected ? colors.icon : "text-gray-600"}`}>{c.time} · {c.agents}</p>
               </button>
             );
           })}

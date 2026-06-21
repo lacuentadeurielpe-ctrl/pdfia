@@ -82,30 +82,38 @@ export async function runOrchestrator(
   // Cada capítulo ocupa aprox (75 / totalSections) % del progreso total
   const progressPerChapter = Math.floor(68 / totalSections);
 
+  // Estándar: solo Writer (1 llamada/cap)
+  // Avanzado:  Researcher + Writer (2 llamadas/cap)
+  // Premium:   Researcher + Writer + Integrador (3 llamadas/cap)
+  const useResearcher  = calidad === "avanzado" || calidad === "premium";
+  const useIntegrator  = calidad === "premium";
+
   for (let i = 0; i < outline.sections.length; i++) {
     const section = outline.sections[i];
     const baseProgress = 12 + i * progressPerChapter;
 
-    // ── Investigador (DeepSeek) ──
+    // ── Investigador (DeepSeek) — Avanzado y Premium ──
+    let research = "";
+    if (useResearcher) {
+      emit({
+        phase: "escribiendo",
+        message: `🔍 Investigando cap ${i + 1}/${totalSections}: "${section.title}" (${section.targetPages}p)`,
+        progress: baseProgress,
+      });
+      research = await researchChapter(
+        section,
+        outline,
+        bookContext,
+        models.writer,
+        models.researcherMaxTokens
+      );
+    }
+
+    // ── Escritor (DeepSeek) — todos los niveles ──
     emit({
       phase: "escribiendo",
-      message: `🔍 Investigando cap ${i + 1}/${totalSections}: "${section.title}" (${section.targetPages}p)`,
-      progress: baseProgress,
-    });
-
-    const research = await researchChapter(
-      section,
-      outline,
-      bookContext,
-      models.writer,
-      models.researcherMaxTokens
-    );
-
-    // ── Escritor (DeepSeek) ──
-    emit({
-      phase: "escribiendo",
-      message: `✍️ Escribiendo cap ${i + 1}/${totalSections}: "${section.title}"`,
-      progress: baseProgress + Math.floor(progressPerChapter * 0.35),
+      message: `✍️ Escribiendo cap ${i + 1}/${totalSections}: "${section.title}" (${section.targetPages}p)`,
+      progress: baseProgress + Math.floor(progressPerChapter * (useResearcher ? 0.4 : 0.2)),
     });
 
     const draft = await writeSection(
@@ -117,20 +125,24 @@ export async function runOrchestrator(
       models.writerMaxTokens
     );
 
-    // ── Integrador/Revisor (Claude) ──
-    emit({
-      phase: "escribiendo",
-      message: `🔧 Revisando e integrando cap ${i + 1}/${totalSections}: "${section.title}"`,
-      progress: baseProgress + Math.floor(progressPerChapter * 0.65),
-    });
-
-    const finalSection = await integrateChapter(
-      draft,
-      section,
-      bookContext,
-      models.integrator,
-      models.integratorMaxTokens
-    );
+    // ── Integrador/Revisor (Claude) — solo Premium ──
+    let finalSection: Section;
+    if (useIntegrator) {
+      emit({
+        phase: "escribiendo",
+        message: `🔧 Revisando e integrando cap ${i + 1}/${totalSections}: "${section.title}"`,
+        progress: baseProgress + Math.floor(progressPerChapter * 0.7),
+      });
+      finalSection = await integrateChapter(
+        draft,
+        section,
+        bookContext,
+        models.integrator,
+        models.integratorMaxTokens
+      );
+    } else {
+      finalSection = draft;
+    }
 
     completedSections.push(finalSection);
 
