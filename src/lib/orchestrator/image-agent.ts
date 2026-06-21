@@ -2,13 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { ImageComplexity } from "./parser";
 
-// Director decide el modelo según complejidad
-// Gemini Developer API sólo soporta gemini-2.0-flash-preview-image-generation para imágenes
-function selectImageModel(complexity: ImageComplexity): string {
-  // El prompt enriquecido compensa la complejidad — mismo modelo, mejor prompt
-  void complexity;
-  return "gemini-2.0-flash-preview-image-generation";
-}
+// Modelo por defecto si no se pasa uno explícito (verificado disponible vía ListModels)
+const DEFAULT_IMAGE_MODEL = "gemini-2.5-flash-image";
 
 // Enriquece el prompt para hacerlo cinematográfico
 function enrichPrompt(
@@ -34,14 +29,15 @@ export async function generateImage(
   projectId: string,
   sectionOrder: number,
   brandColors: { primario: string; secundario: string; acento: string },
-  style: string
+  style: string,
+  imageModel: string = DEFAULT_IMAGE_MODEL
 ): Promise<string | null> {
   if (imageComplexity === "none" || !imagePrompt.trim()) {
     console.log(`[image-agent] Sección ${sectionOrder} omitida — complexity=${imageComplexity}, prompt="${imagePrompt.slice(0, 40)}"`);
     return null;
   }
 
-  const model = selectImageModel(imageComplexity);
+  const model = imageModel;
   const finalPrompt = enrichPrompt(imagePrompt, sectionTitle, brandColors, style);
 
   const apiKey =

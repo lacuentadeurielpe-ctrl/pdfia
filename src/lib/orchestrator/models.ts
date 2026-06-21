@@ -11,6 +11,7 @@ export interface QualityModels {
   writer: string;            // DeepSeek — redacción económica de alta calidad
   integrator: string;        // Claude — revisión y expansión de capítulos
   editor: string;            // Claude — revisión global final
+  imageModel: string;        // Gemini — generación de imágenes
   writerMaxTokens: number;
   integratorMaxTokens: number;
   researcherMaxTokens: number;
@@ -24,6 +25,7 @@ export function getQualityModels(calidad: Calidad): QualityModels {
         writer:                "deepseek-chat",
         integrator:            "claude-opus-4-8",
         editor:                "claude-sonnet-4-6",
+        imageModel:            "gemini-3-pro-image",
         writerMaxTokens:       8000,
         integratorMaxTokens:   6000,
         researcherMaxTokens:   2500,
@@ -34,6 +36,7 @@ export function getQualityModels(calidad: Calidad): QualityModels {
         writer:                "deepseek-chat",
         integrator:            "claude-sonnet-4-6",
         editor:                "claude-haiku-4-5-20251001",
+        imageModel:            "gemini-2.5-flash-image",
         writerMaxTokens:       6000,
         integratorMaxTokens:   4000,
         researcherMaxTokens:   2000,
@@ -44,6 +47,7 @@ export function getQualityModels(calidad: Calidad): QualityModels {
         writer:                "deepseek-chat",
         integrator:            "claude-haiku-4-5-20251001",
         editor:                "claude-haiku-4-5-20251001",
+        imageModel:            "gemini-2.5-flash-image",
         writerMaxTokens:       4000,
         integratorMaxTokens:   3000,
         researcherMaxTokens:   1500,

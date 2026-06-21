@@ -160,7 +160,8 @@ export async function runOrchestrator(
         projectId,
         s.order,
         { primario: brand.colorPrimario, secundario: brand.colorSecundario, acento: brand.colorAcento },
-        outline.style
+        outline.style,
+        models.imageModel
       );
 
       imageMap.set(s.order, url);
