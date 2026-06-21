@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle, Circle, Loader2, AlertCircle, Download, Sparkles } from "lucide-react";
+import { CheckCircle, Circle, Loader2, AlertCircle, Download, Sparkles, FileText } from "lucide-react";
 
 interface Proyecto {
   id: string;
@@ -15,199 +15,243 @@ interface Proyecto {
 }
 
 interface LogEntry {
-  agente: string;
-  estado: "running" | "completed" | "error";
-  mensaje: string;
+  message: string;
   ts: string;
+  phase: string;
 }
 
-const AGENT_ICONS: Record<string, string> = {
-  director: "🎬",
-  planificador: "📋",
-  escritor: "✍️",
-  visual: "🖼️",
-  editor: "🔍",
-  ensamblador: "📄",
-};
+const FASES = [
+  { key: "planificando",        label: "Planificando" },
+  { key: "escribiendo",         label: "Escribiendo" },
+  { key: "editando",            label: "Editando" },
+  { key: "generando_imagenes",  label: "Imágenes IA" },
+  { key: "ensamblando",         label: "Ensamblando" },
+  { key: "completado",          label: "¡Listo!" },
+];
+
+const FASE_ORDER = FASES.map((f) => f.key);
 
 export default function GeneradorClient({ proyecto }: { proyecto: Proyecto }) {
   const router = useRouter();
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [estado, setEstado] = useState(proyecto.estado);
+  const [phase, setPhase] = useState<string>(proyecto.estado);
+  const [progress, setProgress] = useState(0);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfTitulo, setPdfTitulo] = useState<string>(proyecto.titulo || "");
   const [iniciado, setIniciado] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const logsEndRef = useRef<HTMLDivElement>(null);
-  const esFinished = ["completado", "error"].includes(estado);
+
+  const isFinished = phase === "completado" || phase === "error";
+  const faseIdx = FASE_ORDER.indexOf(phase);
 
   useEffect(() => {
     logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
 
   useEffect(() => {
-    if (iniciado || esFinished) return;
+    if (iniciado || isFinished) return;
     setIniciado(true);
 
-    // Iniciar generación vía SSE
     const source = new EventSource(`/api/pdf/generar/${proyecto.id}`);
 
     source.onmessage = (e) => {
       try {
-        const data = JSON.parse(e.data);
-        if (data.type === "log") {
-          setLogs((prev) => [...prev, {
-            agente: data.agente,
-            estado: data.estado,
-            mensaje: data.mensaje,
-            ts: new Date().toLocaleTimeString("es-PE"),
-          }]);
-        } else if (data.type === "estado") {
-          setEstado(data.estado);
-        } else if (data.type === "done") {
-          setPdfUrl(data.pdfUrl);
-          setEstado("completado");
+        const ev = JSON.parse(e.data) as {
+          phase: string;
+          message: string;
+          progress: number;
+          data?: { pdfUrl?: string; titulo?: string };
+        };
+
+        setPhase(ev.phase);
+        setProgress(ev.progress);
+
+        setLogs((prev) => [
+          ...prev,
+          { message: ev.message, ts: new Date().toLocaleTimeString("es-PE"), phase: ev.phase },
+        ]);
+
+        if (ev.phase === "completado" && ev.data?.pdfUrl) {
+          setPdfUrl(ev.data.pdfUrl);
+          setPdfTitulo(ev.data.titulo ?? pdfTitulo);
           source.close();
-        } else if (data.type === "error") {
-          setEstado("error");
+        }
+
+        if (ev.phase === "error") {
+          setErrorMsg(ev.message);
           source.close();
         }
       } catch {}
     };
 
     source.onerror = () => {
-      setLogs((prev) => [...prev, {
-        agente: "sistema",
-        estado: "error",
-        mensaje: "Conexión perdida con el servidor",
-        ts: new Date().toLocaleTimeString("es-PE"),
-      }]);
+      if (phase !== "completado") {
+        setLogs((prev) => [...prev, {
+          message: "⚠️ Conexión interrumpida con el servidor",
+          ts: new Date().toLocaleTimeString("es-PE"),
+          phase: "error",
+        }]);
+      }
       source.close();
     };
 
     return () => source.close();
-  }, [proyecto.id, iniciado, esFinished]);
-
-  const FASES = [
-    { key: "planificando",         label: "Planificando estructura" },
-    { key: "escribiendo",          label: "Escribiendo capítulos" },
-    { key: "generando_imagenes",   label: "Generando imágenes IA" },
-    { key: "ensamblando",          label: "Ensamblando PDF" },
-    { key: "completado",           label: "¡PDF listo!" },
-  ];
-
-  const faseIdx = FASES.findIndex((f) => f.key === estado);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [proyecto.id]);
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{proyecto.titulo}</h1>
-        <p className="text-gray-400 text-sm mt-1">
+    <div className="p-8 max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div>
+        <div className="flex items-center gap-3 mb-1">
+          <FileText className="w-5 h-5 text-indigo-400" />
+          <h1 className="text-2xl font-bold text-white">{pdfTitulo || proyecto.titulo}</h1>
+        </div>
+        <p className="text-gray-400 text-sm ml-8">
           {proyecto.num_capitulos} capítulos · {proyecto.modelo_ia} · tono {proyecto.tono}
+          {proyecto.incluir_imagenes ? " · imágenes IA activadas" : ""}
         </p>
       </div>
 
-      {/* Progress steps */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-6">
+      {/* Progress stepper */}
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
         <div className="flex items-center justify-between">
-          {FASES.map((fase, i) => (
-            <div key={fase.key} className="flex items-center">
-              <div className="flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                  i < faseIdx
-                    ? "bg-emerald-600"
-                    : i === faseIdx && estado !== "completado"
-                    ? "bg-indigo-600 animate-pulse"
-                    : estado === "completado" && i === faseIdx
-                    ? "bg-emerald-600"
-                    : "bg-gray-800 border border-gray-700"
-                }`}>
-                  {i < faseIdx || (estado === "completado" && i <= faseIdx) ? (
-                    <CheckCircle className="w-4 h-4 text-white" />
-                  ) : i === faseIdx ? (
-                    <Loader2 className="w-4 h-4 text-white animate-spin" />
-                  ) : (
-                    <Circle className="w-4 h-4 text-gray-600" />
-                  )}
+          {FASES.map((fase, i) => {
+            const done = i < faseIdx || phase === "completado";
+            const active = i === faseIdx && phase !== "completado" && phase !== "error";
+            return (
+              <div key={fase.key} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${
+                    done    ? "bg-emerald-600" :
+                    active  ? "bg-indigo-600" :
+                    phase === "error" && i === faseIdx ? "bg-red-700" :
+                              "bg-gray-800 border border-gray-700"
+                  }`}>
+                    {done ? (
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    ) : active ? (
+                      <Loader2 className="w-4 h-4 text-white animate-spin" />
+                    ) : phase === "error" && i === faseIdx ? (
+                      <AlertCircle className="w-4 h-4 text-white" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-gray-600" />
+                    )}
+                  </div>
+                  <p className={`text-xs mt-2 text-center max-w-16 leading-tight ${
+                    done || active ? "text-white" : "text-gray-600"
+                  }`}>{fase.label}</p>
                 </div>
-                <p className={`text-xs mt-2 text-center max-w-20 leading-tight ${
-                  i <= faseIdx ? "text-white" : "text-gray-600"
-                }`}>{fase.label}</p>
+                {i < FASES.length - 1 && (
+                  <div className={`h-px w-6 mx-1.5 mb-5 transition-colors duration-500 ${
+                    done ? "bg-emerald-600" : "bg-gray-700"
+                  }`} />
+                )}
               </div>
-              {i < FASES.length - 1 && (
-                <div className={`h-px w-8 mx-2 mb-5 transition-colors ${
-                  i < faseIdx ? "bg-emerald-600" : "bg-gray-700"
-                }`} />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
+
+        {/* Barra de progreso */}
+        <div className="mt-5 bg-gray-800 rounded-full h-1.5 overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-700"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <p className="text-xs text-gray-500 mt-1.5 text-right">{progress}%</p>
       </div>
 
-      {/* Logs */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden mb-6">
+      {/* Log terminal */}
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-800">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className="text-white font-medium text-sm">Orquestador en tiempo real</span>
+            <span className="text-white font-medium text-sm">Orquestador multi-agente</span>
           </div>
-          {estado !== "completado" && estado !== "error" && (
+          {!isFinished && (
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
-              <span className="text-xs text-gray-400">Trabajando...</span>
+              <span className="text-xs text-gray-500">En vivo</span>
             </div>
           )}
         </div>
 
-        <div className="h-72 overflow-y-auto p-4 font-mono space-y-2">
+        <div className="h-80 overflow-y-auto p-4 font-mono space-y-1.5">
           {logs.length === 0 && (
             <div className="flex items-center gap-2 text-gray-600 text-xs">
               <Loader2 className="w-3 h-3 animate-spin" />
-              Iniciando orquestador...
+              Conectando con el orquestador...
             </div>
           )}
           {logs.map((log, i) => (
-            <div key={i} className="flex items-start gap-2 text-xs">
-              <span className="text-gray-600 flex-shrink-0 w-16">{log.ts}</span>
-              <span className="flex-shrink-0">{AGENT_ICONS[log.agente] ?? "🤖"}</span>
-              <span className={`flex-shrink-0 w-24 font-semibold ${
-                log.estado === "error" ? "text-red-400" :
-                log.estado === "completed" ? "text-emerald-400" : "text-indigo-400"
-              }`}>[{log.agente}]</span>
-              <span className="text-gray-300">{log.mensaje}</span>
+            <div key={i} className="flex items-start gap-2 text-xs leading-relaxed">
+              <span className="text-gray-600 flex-shrink-0 tabular-nums">{log.ts}</span>
+              <span className={`flex-shrink-0 ${
+                log.phase === "error"      ? "text-red-400" :
+                log.phase === "completado" ? "text-emerald-400" :
+                log.phase === "editando"   ? "text-yellow-400" :
+                log.phase === "generando_imagenes" ? "text-pink-400" :
+                                             "text-indigo-400"
+              }`}>▸</span>
+              <span className="text-gray-200">{log.message}</span>
             </div>
           ))}
           <div ref={logsEndRef} />
         </div>
       </div>
 
-      {/* Estado final */}
-      {estado === "completado" && pdfUrl && (
-        <div className="bg-emerald-950 border border-emerald-800 rounded-2xl p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-emerald-400" />
-            <div>
-              <p className="text-white font-bold">¡Tu PDF está listo!</p>
-              <p className="text-emerald-400 text-sm">Generado exitosamente con IA multi-agente</p>
+      {/* Resultado final — PDF listo */}
+      {phase === "completado" && pdfUrl && (
+        <div className="bg-emerald-950 border border-emerald-800 rounded-2xl p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-white font-bold">¡Tu ebook está listo!</p>
+                <p className="text-emerald-400 text-sm">Generado con sistema multi-agente IA</p>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-3">
-            <a href={pdfUrl} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white
-                         font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
-              <Download className="w-4 h-4" />
-              Descargar PDF
-            </a>
-            <button onClick={() => router.push("/crear")}
-              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2.5 rounded-xl text-sm transition-colors">
-              Crear otro
-            </button>
+            <div className="flex gap-3">
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500
+                           text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm"
+              >
+                <Download className="w-4 h-4" />
+                Descargar PDF
+              </a>
+              <button
+                onClick={() => router.push("/crear")}
+                className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2.5
+                           rounded-xl text-sm transition-colors"
+              >
+                Crear otro
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {estado === "error" && (
-        <div className="bg-red-950 border border-red-800 rounded-2xl p-5 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-          <p className="text-red-300 text-sm">Ocurrió un error durante la generación. Revisa los logs y vuelve a intentarlo.</p>
+      {/* Error */}
+      {phase === "error" && (
+        <div className="bg-red-950 border border-red-800 rounded-2xl p-5 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-red-300 font-medium text-sm">Error durante la generación</p>
+            {errorMsg && <p className="text-red-400/80 text-xs mt-1">{errorMsg}</p>}
+            <button
+              onClick={() => router.push("/crear")}
+              className="mt-3 text-xs bg-red-900 hover:bg-red-800 text-red-200 px-4 py-2 rounded-lg transition-colors"
+            >
+              Volver a intentar
+            </button>
+          </div>
         </div>
       )}
     </div>
