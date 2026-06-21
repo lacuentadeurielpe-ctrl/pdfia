@@ -42,7 +42,12 @@ export async function generateImage(
     const model = selectImageModel(imageComplexity);
     const finalPrompt = enrichPrompt(imagePrompt, sectionTitle, brandColors, style);
 
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+    const apiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+      process.env.GOOGLE_API_KEY;
+    if (!apiKey) return null;
+    const ai = new GoogleGenAI({ apiKey });
     const res = await ai.models.generateContent({
       model,
       contents: [{ role: "user", parts: [{ text: finalPrompt }] }],

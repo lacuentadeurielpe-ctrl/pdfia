@@ -30,16 +30,18 @@ function parseRetryDelay(err: unknown): number {
 
 function friendlyError(err: unknown, provider: ModelProvider): string {
   const raw = err instanceof Error ? err.message : JSON.stringify(err);
+  console.error(`[models] Error en ${provider}:`, raw.slice(0, 500));
+  if (raw.includes("API key de Gemini no configurada")) return raw;
   if (raw.includes("RESOURCE_EXHAUSTED") || raw.includes("free_tier")) {
-    return `Cuota de Gemini agotada. Activa facturación en Google AI Studio o selecciona DeepSeek / Claude como modelo.`;
+    return `Gemini RESOURCE_EXHAUSTED — revisa en Vercel que la variable GEMINI_API_KEY esté bien escrita y que el proyecto de Google Cloud tenga billing activo.`;
   }
   if (raw.includes("429") || raw.includes("rate_limit")) {
-    return `Límite de velocidad alcanzado en ${provider}. Reintenta en unos segundos.`;
+    return `Límite de velocidad en ${provider}. Reintenta en unos segundos.`;
   }
   if (raw.includes("401") || raw.includes("API key") || raw.includes("API_KEY")) {
-    return `API key de ${provider} inválida o no configurada. Revisa las variables de entorno.`;
+    return `API key de ${provider} inválida. Revisa las variables de entorno en Vercel.`;
   }
-  return raw.split("\n")[0].slice(0, 200) || `Error en ${provider}`;
+  return `[${provider}] ${raw.split("\n")[0].slice(0, 300)}`;
 }
 
 async function sleep(ms: number) {
@@ -80,7 +82,13 @@ export async function callTextModel(
   switch (provider) {
     case "gemini":
       return callWithRetry(async () => {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+        const apiKey =
+          process.env.GEMINI_API_KEY ||
+          process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+          process.env.GOOGLE_API_KEY;
+        if (!apiKey) throw new Error("API key de Gemini no configurada. Agrega GEMINI_API_KEY en las variables de entorno de Vercel.");
+        console.log(`[models] Gemini key found (${apiKey.slice(0, 8)}...), model: ${modelId}`);
+        const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
           model: modelId,
           generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
