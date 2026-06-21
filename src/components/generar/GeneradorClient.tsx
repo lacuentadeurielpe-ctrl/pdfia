@@ -92,14 +92,44 @@ export default function GeneradorClient({
     };
 
     source.onerror = () => {
-      if (phase !== "completado") {
-        setLogs((prev) => [...prev, {
-          message: "⚠️ Conexión interrumpida con el servidor",
-          ts: new Date().toLocaleTimeString("es-PE"),
-          phase: "error",
-        }]);
-      }
       source.close();
+      if (phase === "completado") return;
+
+      // El SSE se cortó pero el servidor puede seguir trabajando.
+      // Hacemos polling del estado hasta que complete o falle de verdad.
+      setLogs((prev) => [...prev, {
+        message: "⏳ Stream interrumpido — verificando estado en segundo plano...",
+        ts: new Date().toLocaleTimeString("es-PE"),
+        phase: "escribiendo",
+      }]);
+
+      const poll = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/pdf/estado/${proyecto.id}`);
+          if (!res.ok) return;
+          const data = await res.json() as { estado: string; previewUrl?: string | null; titulo?: string };
+
+          if (data.estado === "completado" && data.previewUrl) {
+            clearInterval(poll);
+            setPhase("completado");
+            setProgress(100);
+            setPdfUrl(data.previewUrl);
+            if (data.titulo) setPdfTitulo(data.titulo);
+            setLogs((prev) => [...prev, {
+              message: "🎉 ¡Documento completado!",
+              ts: new Date().toLocaleTimeString("es-PE"),
+              phase: "completado",
+            }]);
+          } else if (data.estado === "error") {
+            clearInterval(poll);
+            setPhase("error");
+            setErrorMsg("La generación falló en el servidor.");
+          }
+        } catch {}
+      }, 5000);
+
+      // Detener el polling tras 13 minutos como salvaguarda
+      setTimeout(() => clearInterval(poll), 13 * 60 * 1000);
     };
 
     return () => source.close();

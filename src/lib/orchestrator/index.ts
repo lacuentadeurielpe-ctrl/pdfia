@@ -145,35 +145,38 @@ export async function runOrchestrator(
 
     const imageMap = new Map<number, string | null>();
 
-    for (let i = 0; i < sectionsNeedingImages.length; i++) {
-      const s = sectionsNeedingImages[i];
-      emit({
-        phase: "generando_imagenes",
-        message: `🎨 Imagen ${i + 1}/${sectionsNeedingImages.length} → "${s.title}"`,
-        progress: 87 + Math.floor((i / Math.max(sectionsNeedingImages.length, 1)) * 9),
-      });
+    emit({
+      phase: "generando_imagenes",
+      message: `🎨 Generando ${sectionsNeedingImages.length} imágenes en paralelo...`,
+      progress: 89,
+    });
 
-      const url = await generateImage(
-        s.imagePrompt,
-        s.imageComplexity,
-        s.title,
-        projectId,
-        s.order,
-        { primario: brand.colorPrimario, secundario: brand.colorSecundario, acento: brand.colorAcento },
-        outline.style,
-        models.imageModel
-      );
-
-      imageMap.set(s.order, url);
-
-      emit({
-        phase: "generando_imagenes",
-        message: url
-          ? `✅ Imagen lista para "${s.title}"`
-          : `⚠️ Imagen omitida para "${s.title}" (sin créditos o error)`,
-        progress: 87 + Math.floor(((i + 1) / Math.max(sectionsNeedingImages.length, 1)) * 9),
-      });
-    }
+    // Gemini ahora SOLO hace imágenes (el texto es Claude/DeepSeek), así que
+    // podemos generarlas todas en paralelo sin saturar el RPM. Ahorra ~30-40s.
+    let listas = 0;
+    await Promise.all(
+      sectionsNeedingImages.map(async (s) => {
+        const url = await generateImage(
+          s.imagePrompt,
+          s.imageComplexity,
+          s.title,
+          projectId,
+          s.order,
+          { primario: brand.colorPrimario, secundario: brand.colorSecundario, acento: brand.colorAcento },
+          outline.style,
+          models.imageModel
+        );
+        imageMap.set(s.order, url);
+        listas++;
+        emit({
+          phase: "generando_imagenes",
+          message: url
+            ? `✅ Imagen ${listas}/${sectionsNeedingImages.length} lista — "${s.title}"`
+            : `⚠️ Imagen omitida — "${s.title}"`,
+          progress: 89 + Math.floor((listas / Math.max(sectionsNeedingImages.length, 1)) * 7),
+        });
+      })
+    );
 
     finalSections = editedSections.map((s) => ({
       ...s,
