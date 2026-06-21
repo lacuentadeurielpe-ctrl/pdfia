@@ -2,7 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { runOrchestrator, type OrchestratorEvent } from "@/lib/orchestrator";
 
-export const maxDuration = 800;
+export const maxDuration = 300; // Hobby cap; Vercel rechaza valores mayores
 export const dynamic = "force-dynamic";
 
 function sseChunk(event: OrchestratorEvent): string {
