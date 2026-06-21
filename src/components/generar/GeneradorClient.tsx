@@ -217,7 +217,7 @@ export default function GeneradorClient({ proyecto }: { proyecto: Proyecto }) {
             </div>
             <div className="flex gap-3">
               <a
-                href={`${pdfUrl}?print=1`}
+                href={`/preview/${proyecto.id}?print=1`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500
@@ -227,7 +227,7 @@ export default function GeneradorClient({ proyecto }: { proyecto: Proyecto }) {
                 Abrir y guardar PDF
               </a>
               <a
-                href={pdfUrl}
+                href={`/preview/${proyecto.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600
