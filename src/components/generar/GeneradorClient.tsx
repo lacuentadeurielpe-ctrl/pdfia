@@ -204,7 +204,7 @@ export default function GeneradorClient({ proyecto }: { proyecto: Proyecto }) {
 
       {/* Resultado final — PDF listo */}
       {phase === "completado" && pdfUrl && (
-        <div className="bg-emerald-950 border border-emerald-800 rounded-2xl p-6">
+        <div className="bg-emerald-950 border border-emerald-800 rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center">
@@ -217,14 +217,24 @@ export default function GeneradorClient({ proyecto }: { proyecto: Proyecto }) {
             </div>
             <div className="flex gap-3">
               <a
-                href={pdfUrl}
+                href={`${pdfUrl}?print=1`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500
                            text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm"
               >
                 <Download className="w-4 h-4" />
-                Descargar PDF
+                Abrir y guardar PDF
+              </a>
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600
+                           text-white px-4 py-2.5 rounded-xl text-sm transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                Solo ver
               </a>
               <button
                 onClick={() => router.push("/crear")}
@@ -234,6 +244,11 @@ export default function GeneradorClient({ proyecto }: { proyecto: Proyecto }) {
                 Crear otro
               </button>
             </div>
+          </div>
+          <div className="bg-emerald-900/40 rounded-xl px-4 py-3 text-xs text-emerald-300">
+            💡 <span className="font-semibold">Para guardar como PDF:</span> haz clic en
+            &quot;Abrir y guardar PDF&quot; → el diálogo de impresión se abrirá automáticamente →
+            selecciona <span className="font-semibold">Guardar como PDF</span> como destino.
           </div>
         </div>
       )}

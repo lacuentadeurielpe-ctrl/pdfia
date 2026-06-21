@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { runOrchestrator, type OrchestratorEvent } from "@/lib/orchestrator";
-import { generatePDFFromHtml } from "@/lib/pdf/generator";
 
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
@@ -122,19 +121,16 @@ export async function GET(
           })
           .eq("id", proyectoId);
 
-        // ── Generar PDF con puppeteer ──
-        emit({ phase: "ensamblando", message: "🖨️ Renderizando PDF con Puppeteer...", progress: 94 });
+        // ── Subir HTML a Supabase Storage (sin Puppeteer — el navegador imprime a PDF) ──
+        emit({ phase: "ensamblando", message: "☁️ Subiendo documento a almacenamiento...", progress: 94 });
 
-        const pdfBuffer = await generatePDFFromHtml(result.htmlContent);
-        const fileName = `${proyectoId}/${Date.now()}.pdf`;
+        const htmlBytes = Buffer.from(result.htmlContent, "utf-8");
+        const fileName = `${proyectoId}/${Date.now()}.html`;
 
-        emit({ phase: "ensamblando", message: "☁️ Subiendo PDF a almacenamiento...", progress: 97 });
-
-        // ── Subir PDF a Supabase Storage ──
         const { error: uploadError } = await supabaseAdmin.storage
           .from("pdfs")
-          .upload(fileName, pdfBuffer, {
-            contentType: "application/pdf",
+          .upload(fileName, htmlBytes, {
+            contentType: "text/html; charset=utf-8",
             upsert: true,
           });
 
@@ -144,42 +140,39 @@ export async function GET(
           .from("pdfs")
           .getPublicUrl(fileName);
 
-        const pdfUrl = urlData.publicUrl;
+        const docUrl = urlData.publicUrl;
 
         // ── Registrar en pdfs_generados ──
         const imagesCount = result.sections.filter((s) => s.imageUrl).length;
 
         await supabaseAdmin.from("pdfs_generados").insert({
-          proyecto_id:         proyectoId,
-          user_id:             user.id,
-          titulo:              result.outline.bookTitle,
-          storage_path:        fileName,
-          storage_url:         pdfUrl,
-          tamano_bytes:        pdfBuffer.length,
-          modelo_ia:           proyecto.modelo_ia,
-          modelo_imagen:       proyecto.incluir_imagenes ? "gemini-auto" : null,
-          imagenes_generadas:  imagesCount,
+          proyecto_id:        proyectoId,
+          user_id:            user.id,
+          titulo:             result.outline.bookTitle,
+          storage_path:       fileName,
+          storage_url:        docUrl,
+          tamano_bytes:       htmlBytes.length,
+          modelo_ia:          proyecto.modelo_ia,
+          modelo_imagen:      proyecto.incluir_imagenes ? "gemini-auto" : null,
+          imagenes_generadas: imagesCount,
         });
 
         // ── Marcar proyecto completado ──
         await supabaseAdmin
           .from("proyectos_pdf")
-          .update({
-            estado:      "completado",
-            updated_at:  new Date().toISOString(),
-          })
+          .update({ estado: "completado", updated_at: new Date().toISOString() })
           .eq("id", proyectoId);
 
         emit({
           phase: "completado",
-          message: `🎉 ¡PDF "${result.outline.bookTitle}" listo!`,
+          message: `🎉 ¡"${result.outline.bookTitle}" listo! Ábrelo y usa Ctrl+P → Guardar como PDF`,
           progress: 100,
           data: {
-            pdfUrl,
-            titulo:     result.outline.bookTitle,
-            secciones:  result.sections.length,
-            imagenes:   imagesCount,
-            bytes:      pdfBuffer.length,
+            pdfUrl:   docUrl,
+            titulo:   result.outline.bookTitle,
+            secciones: result.sections.length,
+            imagenes:  imagesCount,
+            bytes:     htmlBytes.length,
           },
         });
       } catch (err) {

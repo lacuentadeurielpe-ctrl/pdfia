@@ -378,6 +378,15 @@ export function buildPDFHtml(
 <!-- SECCIONES -->
 ${sectionHtml}
 
+
+<script>
+  // Auto-print si viene con ?print=1 en la URL
+  if (typeof window !== 'undefined' && window.location.search.includes('print=1')) {
+    window.addEventListener('load', function() {
+      setTimeout(function() { window.print(); }, 800);
+    });
+  }
+</script>
 </body>
 </html>`;
 }
