@@ -1,40 +1,28 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createServerClient } from "@supabase/ssr";
 
-const PUBLIC_ROUTES = ["/login", "/api/auth"];
+const PUBLIC_ROUTES = ["/login", "/api/auth", "/_next", "/favicon.ico"];
 
-export async function middleware(request: NextRequest) {
+// Cookie que Supabase SSR establece al autenticar
+const SUPABASE_AUTH_COOKIE = `sb-acekctqfxzmwiumvcfht-auth-token`;
+
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublic = PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
 
-  const response = NextResponse.next({ request });
+  // Verificar si existe la cookie de sesión de Supabase
+  const hasSession =
+    request.cookies.has(SUPABASE_AUTH_COOKIE) ||
+    request.cookies.has(`${SUPABASE_AUTH_COOKIE}.0`);
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) => {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2]);
-          });
-        },
-      },
-    }
-  );
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user && !isPublic) {
+  if (!hasSession && !isPublic) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  if (user && pathname === "/login") {
+
+  if (hasSession && pathname === "/login") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
