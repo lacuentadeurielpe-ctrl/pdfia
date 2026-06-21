@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --brand-50:  239 246 255;
+  --brand-100: 219 234 254;
+  --brand-500: 99 102 241;
+  --brand-600: 79 70 229;
+  --brand-700: 67 56 202;
+  --brand-900: 30 27 75;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  body { @apply bg-gray-950 text-gray-100 font-sans antialiased; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-gray-900; }
+  ::-webkit-scrollbar-thumb { @apply bg-gray-700 rounded-full; }
+}
