@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_ROUTES = ["/login", "/api/auth", "/_next", "/favicon.ico"];
+const PUBLIC_ROUTES = ["/login", "/api/auth", "/api/debug", "/_next", "/favicon.ico"];
 
 // Cookie que Supabase SSR establece al autenticar
 const SUPABASE_AUTH_COOKIE = `sb-acekctqfxzmwiumvcfht-auth-token`;
