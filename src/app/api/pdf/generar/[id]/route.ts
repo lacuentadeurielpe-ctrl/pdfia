@@ -130,7 +130,7 @@ export async function GET(
         const { error: uploadError } = await supabaseAdmin.storage
           .from("pdfs")
           .upload(fileName, htmlBytes, {
-            contentType: "application/octet-stream",
+            contentType: "text/html",
             upsert: true,
           });
 
