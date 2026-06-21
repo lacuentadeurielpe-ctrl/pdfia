@@ -23,7 +23,6 @@ interface LogEntry {
 const FASES = [
   { key: "planificando",        label: "Planificando" },
   { key: "escribiendo",         label: "Escribiendo" },
-  { key: "editando",            label: "Editando" },
   { key: "generando_imagenes",  label: "Imágenes IA" },
   { key: "ensamblando",         label: "Ensamblando" },
   { key: "completado",          label: "¡Listo!" },
@@ -59,80 +58,91 @@ export default function GeneradorClient({
     if (iniciado || isFinished) return;
     setIniciado(true);
 
-    const source = new EventSource(`/api/pdf/generar/${proyecto.id}`);
+    let current: EventSource | null = null;
+    let done = false;
+    let reconnects = 0;
+    const MAX_RECONNECTS = 60; // soporta libros muy largos (cada tramo ~4min)
 
-    source.onmessage = (e) => {
-      try {
-        const ev = JSON.parse(e.data) as {
-          phase: string;
-          message: string;
-          progress: number;
-          data?: { pdfUrl?: string; titulo?: string };
-        };
+    const addLog = (message: string, ph: string) =>
+      setLogs((prev) => [...prev, { message, ts: new Date().toLocaleTimeString("es-PE"), phase: ph }]);
 
-        setPhase(ev.phase);
-        setProgress(ev.progress);
+    const finish = () => { done = true; current?.close(); };
 
-        setLogs((prev) => [
-          ...prev,
-          { message: ev.message, ts: new Date().toLocaleTimeString("es-PE"), phase: ev.phase },
-        ]);
-
-        if (ev.phase === "completado" && ev.data?.pdfUrl) {
-          setPdfUrl(ev.data.pdfUrl);
-          setPdfTitulo(ev.data.titulo ?? pdfTitulo);
-          source.close();
-        }
-
-        if (ev.phase === "error") {
-          setErrorMsg(ev.message);
-          source.close();
-        }
-      } catch {}
+    const reconnect = (delay = 1500) => {
+      current?.close();
+      if (done || reconnects >= MAX_RECONNECTS) return;
+      reconnects++;
+      setTimeout(connect, delay);
     };
 
-    source.onerror = () => {
-      source.close();
-      if (phase === "completado") return;
+    function connect() {
+      if (done) return;
+      const source = new EventSource(`/api/pdf/generar/${proyecto.id}`);
+      current = source;
 
-      // El SSE se cortó pero el servidor puede seguir trabajando.
-      // Hacemos polling del estado hasta que complete o falle de verdad.
-      setLogs((prev) => [...prev, {
-        message: "⏳ Stream interrumpido — verificando estado en segundo plano...",
-        ts: new Date().toLocaleTimeString("es-PE"),
-        phase: "escribiendo",
-      }]);
-
-      const poll = setInterval(async () => {
+      source.onmessage = (e) => {
         try {
-          const res = await fetch(`/api/pdf/estado/${proyecto.id}`);
-          if (!res.ok) return;
-          const data = await res.json() as { estado: string; previewUrl?: string | null; titulo?: string };
+          const ev = JSON.parse(e.data) as {
+            phase: string;
+            message: string;
+            progress: number;
+            data?: { pdfUrl?: string; titulo?: string; resume?: boolean };
+          };
 
-          if (data.estado === "completado" && data.previewUrl) {
-            clearInterval(poll);
-            setPhase("completado");
-            setProgress(100);
-            setPdfUrl(data.previewUrl);
-            if (data.titulo) setPdfTitulo(data.titulo);
-            setLogs((prev) => [...prev, {
-              message: "🎉 ¡Documento completado!",
-              ts: new Date().toLocaleTimeString("es-PE"),
-              phase: "completado",
-            }]);
-          } else if (data.estado === "error") {
-            clearInterval(poll);
-            setPhase("error");
-            setErrorMsg("La generación falló en el servidor.");
+          // Evento de pausa técnica → reanudar reabriendo el stream
+          if (ev.phase === "pausado") {
+            addLog(ev.message, "escribiendo");
+            if (ev.progress) setProgress(ev.progress);
+            reconnect(1200);
+            return;
+          }
+
+          setPhase(ev.phase);
+          if (ev.progress) setProgress(ev.progress);
+          addLog(ev.message, ev.phase);
+
+          if (ev.phase === "completado" && ev.data?.pdfUrl) {
+            setPdfUrl(ev.data.pdfUrl);
+            setPdfTitulo(ev.data.titulo ?? pdfTitulo);
+            finish();
+          }
+          if (ev.phase === "error") {
+            setErrorMsg(ev.message);
+            finish();
           }
         } catch {}
-      }, 5000);
+      };
 
-      // Detener el polling tras 13 minutos como salvaguarda
-      setTimeout(() => clearInterval(poll), 13 * 60 * 1000);
-    };
+      source.onerror = () => {
+        source.close();
+        if (done) return;
+        // El stream se cortó (timeout de Vercel u otro). Verificamos estado y reanudamos.
+        fetch(`/api/pdf/estado/${proyecto.id}`)
+          .then((r) => (r.ok ? r.json() : null))
+          .then((data: { estado: string; previewUrl?: string | null; titulo?: string } | null) => {
+            if (!data) { reconnect(2000); return; }
+            if (data.estado === "completado" && data.previewUrl) {
+              setPhase("completado");
+              setProgress(100);
+              setPdfUrl(data.previewUrl);
+              if (data.titulo) setPdfTitulo(data.titulo);
+              addLog("🎉 ¡Documento completado!", "completado");
+              finish();
+            } else if (data.estado === "error") {
+              setPhase("error");
+              setErrorMsg("La generación falló en el servidor.");
+              finish();
+            } else {
+              addLog("🔄 Reanudando generación...", "escribiendo");
+              reconnect(2000);
+            }
+          })
+          .catch(() => reconnect(2500));
+      };
+    }
 
-    return () => source.close();
+    connect();
+    return () => { done = true; current?.close(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [proyecto.id]);
 
