@@ -162,9 +162,16 @@ export async function runOrchestrator(
   if (generateImages) {
     emit({ phase: "generando_imagenes", message: "🖼️ Agente visual [Gemini] iniciando imágenes...", progress: 87 });
 
+    // Debug: mostrar qué secciones tienen prompt de imagen
+    for (const s of editedSections) {
+      console.log(`[orchestrator] Sección ${s.order} "${s.title}" — complexity=${s.imageComplexity}, prompt="${s.imagePrompt.slice(0, 60)}"`);
+    }
+
     const sectionsNeedingImages = editedSections.filter(
       (s) => s.imageComplexity !== "none" && s.imagePrompt.trim()
     );
+
+    console.log(`[orchestrator] ${sectionsNeedingImages.length}/${editedSections.length} secciones necesitan imagen`);
 
     const imageMap = new Map<number, string | null>();
 
