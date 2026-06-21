@@ -3,19 +3,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { ImageComplexity } from "./parser";
 
 // Director decide el modelo según complejidad
+// Gemini Developer API sólo soporta gemini-2.0-flash-preview-image-generation para imágenes
 function selectImageModel(complexity: ImageComplexity): string {
-  switch (complexity) {
-    case "data":
-    case "technical":
-      // Máxima calidad para datos y diagramas técnicos
-      return "gemini-3-pro-image";
-    case "complex":
-      return "gemini-3.1-flash-image";
-    case "simple":
-    default:
-      // Económico y rápido para ilustraciones decorativas
-      return "gemini-2.5-flash-preview-image-generation";
-  }
+  // El prompt enriquecido compensa la complejidad — mismo modelo, mejor prompt
+  void complexity;
+  return "gemini-2.0-flash-preview-image-generation";
 }
 
 // Enriquece el prompt para hacerlo cinematográfico

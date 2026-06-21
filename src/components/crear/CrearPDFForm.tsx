@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import { Sparkles, Image, BookOpen, Mic2 } from "lucide-react";
 
 const MODELOS = [
-  { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash", desc: "Rápido y eficiente", badge: "Recomendado" },
+  { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash", desc: "Rápido y eficiente", badge: "Recomendado" },
   { id: "gemini-2.5-pro",   label: "Gemini 2.5 Pro",   desc: "Mayor razonamiento", badge: "Premium" },
-  { id: "deepseek-chat",    label: "DeepSeek Chat",    desc: "Muy económico",    badge: "Barato" },
-  { id: "claude-sonnet-4-6",label: "Claude Sonnet",    desc: "Alta calidad",      badge: "Potente" },
+  { id: "deepseek-chat",    label: "DeepSeek Chat",    desc: "Muy económico",      badge: "Barato" },
+  { id: "claude-sonnet-4-6",label: "Claude Sonnet",    desc: "Alta calidad",       badge: "Potente" },
 ];
 
 const TONOS = ["profesional", "educativo", "creativo", "técnico", "divulgativo", "motivacional"];
@@ -16,7 +16,7 @@ export default function CrearPDFForm() {
   const router = useRouter();
   const [contexto, setContexto] = useState("");
   const [titulo, setTitulo] = useState("");
-  const [modelo, setModelo] = useState("gemini-2.0-flash");
+  const [modelo, setModelo] = useState("gemini-2.5-flash");
   const [capitulos, setCapitulos] = useState(5);
   const [tono, setTono] = useState("profesional");
   const [incluirImagenes, setIncluirImagenes] = useState(true);
