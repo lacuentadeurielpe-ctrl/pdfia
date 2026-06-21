@@ -63,40 +63,44 @@ export async function runOrchestrator(
     data: { bookTitle: outline.bookTitle, numSections: outline.sections.length },
   });
 
-  // ── FASE 2: Prompt Engineer prepara prompts ──
-  emit({ phase: "escribiendo", message: "✏️ Ingeniero de prompts preparando instrucciones por capítulo...", progress: 20 });
+  // ── FASE 2: Prompt Engineer prepara prompts (secuencial para no saturar RPM) ──
+  emit({ phase: "escribiendo", message: "✏️ Ingeniero de prompts preparando instrucciones...", progress: 20 });
 
-  // Construir prompts en paralelo (no consumen tokens masivos)
-  const writerPrompts = await Promise.all(
-    outline.sections.map((section) => buildWriterPrompt(outline, section, modelStr))
-  );
+  const writerPrompts: string[] = [];
+  for (let i = 0; i < outline.sections.length; i++) {
+    const section = outline.sections[i];
+    emit({
+      phase: "escribiendo",
+      message: `📋 Preparando prompt ${i + 1}/${outline.sections.length} → "${section.title}"`,
+      progress: 20 + Math.floor((i / outline.sections.length) * 5),
+    });
+    const prompt = await buildWriterPrompt(outline, section, modelStr);
+    writerPrompts.push(prompt);
+  }
 
-  emit({ phase: "escribiendo", message: `✅ ${writerPrompts.length} prompts optimizados generados`, progress: 25 });
+  emit({ phase: "escribiendo", message: `✅ ${writerPrompts.length} prompts listos`, progress: 25 });
 
-  // ── FASE 3: Writers escriben secciones en paralelo ──
+  // ── FASE 3: Writers escriben secciones de a una (evita rate limit) ──
   const totalSections = outline.sections.length;
-  const writtenSections: Section[] = new Array(totalSections);
-  let completedWriters = 0;
+  const writtenSections: Section[] = [];
 
-  const writePromises = outline.sections.map(async (section, i) => {
+  for (let i = 0; i < outline.sections.length; i++) {
+    const section = outline.sections[i];
     emit({
       phase: "escribiendo",
       message: `✍️ Escritor ${i + 1}/${totalSections} → "${section.title}"`,
-      progress: 25 + Math.floor((completedWriters / totalSections) * 35),
+      progress: 25 + Math.floor((i / totalSections) * 35),
     });
 
     const written = await writeSection(writerPrompts[i], section, modelStr);
-    writtenSections[i] = written;
-    completedWriters++;
+    writtenSections.push(written);
 
     emit({
       phase: "escribiendo",
       message: `✅ Capítulo "${written.title}" completado`,
-      progress: 25 + Math.floor((completedWriters / totalSections) * 35),
+      progress: 25 + Math.floor(((i + 1) / totalSections) * 35),
     });
-  });
-
-  await Promise.all(writePromises);
+  }
 
   // ── FASE 4: Editor revisa y deduplica ──
   emit({ phase: "editando", message: "🔍 Editor revisando coherencia y eliminando repeticiones...", progress: 62 });
@@ -115,39 +119,36 @@ export async function runOrchestrator(
       (s) => s.imageComplexity !== "none" && s.imagePrompt.trim()
     );
 
-    let completedImages = 0;
     const imageMap = new Map<number, string | null>();
 
-    await Promise.all(
-      sectionsNeedingImages.map(async (s) => {
-        emit({
-          phase: "generando_imagenes",
-          message: `🎨 Generando imagen [${s.imageComplexity}] → "${s.title}"`,
-          progress: 72 + Math.floor((completedImages / Math.max(sectionsNeedingImages.length, 1)) * 18),
-        });
+    for (let i = 0; i < sectionsNeedingImages.length; i++) {
+      const s = sectionsNeedingImages[i];
+      emit({
+        phase: "generando_imagenes",
+        message: `🎨 Imagen ${i + 1}/${sectionsNeedingImages.length} [${s.imageComplexity}] → "${s.title}"`,
+        progress: 72 + Math.floor((i / Math.max(sectionsNeedingImages.length, 1)) * 18),
+      });
 
-        const url = await generateImage(
-          s.imagePrompt,
-          s.imageComplexity,
-          s.title,
-          projectId,
-          s.order,
-          { primario: brand.colorPrimario, secundario: brand.colorSecundario, acento: brand.colorAcento },
-          outline.style
-        );
+      const url = await generateImage(
+        s.imagePrompt,
+        s.imageComplexity,
+        s.title,
+        projectId,
+        s.order,
+        { primario: brand.colorPrimario, secundario: brand.colorSecundario, acento: brand.colorAcento },
+        outline.style
+      );
 
-        imageMap.set(s.order, url);
-        completedImages++;
+      imageMap.set(s.order, url);
 
-        emit({
-          phase: "generando_imagenes",
-          message: url
-            ? `✅ Imagen generada para "${s.title}"`
-            : `⚠️ Imagen omitida para "${s.title}" (modelo no disponible)`,
-          progress: 72 + Math.floor((completedImages / Math.max(sectionsNeedingImages.length, 1)) * 18),
-        });
-      })
-    );
+      emit({
+        phase: "generando_imagenes",
+        message: url
+          ? `✅ Imagen lista para "${s.title}"`
+          : `⚠️ Imagen omitida para "${s.title}"`,
+        progress: 72 + Math.floor(((i + 1) / Math.max(sectionsNeedingImages.length, 1)) * 18),
+      });
+    }
 
     // Aplicar URLs de imagen a secciones
     finalSections = editedSections.map((s) => ({
