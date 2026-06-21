@@ -54,13 +54,10 @@ export function buildPDFHtml(
       return `
     <div class="section page-break">
       <div class="section-header">
-        <div class="section-num">${String(i + 1).padStart(2, "0")}</div>
-        <div class="section-titles">
-          <h2 class="section-title">${s.title}</h2>
-          ${s.subtitle ? `<p class="section-subtitle">${s.subtitle}</p>` : ""}
-        </div>
+        <span class="section-eyebrow">${nombreNegocio} · Capítulo ${String(i + 1).padStart(2, "0")}</span>
+        <h2 class="section-title">${s.title}</h2>
+        ${s.subtitle ? `<p class="section-subtitle">${s.subtitle}</p>` : ""}
       </div>
-      <div class="section-divider"></div>
       ${imageBlock}
       <div class="section-content"><p>${contentHtml}</p></div>
     </div>`;
@@ -242,92 +239,114 @@ export function buildPDFHtml(
     margin-bottom: 0;
   }
 
-  /* ── SECCIONES ── */
+  /* ── SECCIONES (minimalista) ── */
   .page-break { page-break-before: always; }
 
   .section {
-    padding: 70px 80px;
+    padding: 80px 90px;
     min-height: 100vh;
   }
   .section-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 24px;
-    margin-bottom: 24px;
+    margin-bottom: 36px;
   }
-  .section-num {
-    font-size: 48pt;
-    font-weight: 800;
+  .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
     color: var(--primary);
-    opacity: 0.12;
-    line-height: 1;
-    min-width: 80px;
+    margin-bottom: 18px;
   }
-  .section-titles { flex: 1; }
+  .section-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 2px;
+    background: var(--primary);
+    display: inline-block;
+  }
   .section-title {
     font-family: 'Playfair Display', serif;
-    font-size: 26pt;
-    font-weight: 700;
+    font-size: 30pt;
+    font-weight: 800;
     color: var(--text);
-    line-height: 1.2;
-    margin-bottom: 8px;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
   }
   .section-subtitle {
-    font-size: 13pt;
+    font-size: 13.5pt;
     color: var(--text-muted);
     font-weight: 400;
-    font-style: italic;
+    line-height: 1.5;
+    max-width: 90%;
   }
-  .section-divider {
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--accent), transparent);
-    border-radius: 2px;
-    margin-bottom: 32px;
-  }
+  /* imagen: se muestra COMPLETA, respetando su proporción */
   .section-image {
-    margin: 0 0 32px 0;
-    border-radius: 12px;
+    margin: 0 0 40px 0;
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 24px rgba(var(--rgb-primary), 0.10);
+    background: var(--bg-soft);
   }
   .section-image img {
     width: 100%;
-    height: 280px;
-    object-fit: cover;
+    height: auto;
     display: block;
   }
+  .section-content {
+    font-size: 11.5pt;
+    line-height: 1.8;
+  }
   .section-content p {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     color: var(--text);
     text-align: justify;
     hyphens: auto;
   }
+  /* primer párrafo destacado tipo "lead" */
+  .section-content > p:first-of-type {
+    font-size: 13pt;
+    color: var(--text);
+    line-height: 1.7;
+  }
   .section-content h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 16pt;
+    font-family: 'Inter', sans-serif;
+    font-size: 14pt;
     font-weight: 700;
-    color: var(--primary);
-    margin: 28px 0 12px 0;
+    color: var(--text);
+    margin: 34px 0 14px 0;
+    padding-left: 14px;
+    border-left: 3px solid var(--accent);
+    line-height: 1.3;
   }
   .section-content h4 {
-    font-size: 13pt;
+    font-size: 12pt;
     font-weight: 700;
-    color: var(--text);
-    margin: 20px 0 10px 0;
+    color: var(--primary);
+    margin: 24px 0 10px 0;
   }
   .section-content ul, .section-content ol {
-    margin: 12px 0 16px 24px;
+    margin: 14px 0 20px 4px;
+    padding-left: 22px;
   }
   .section-content li {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     color: var(--text);
+    padding-left: 6px;
+  }
+  .section-content li::marker {
+    color: var(--primary);
   }
   .section-content strong {
     font-weight: 700;
-    color: var(--primary);
+    color: var(--text);
   }
   .section-content em {
     color: var(--text-muted);
+    font-style: italic;
   }
   .section-content code {
     background: var(--bg-soft);
@@ -350,6 +369,7 @@ export function buildPDFHtml(
 
   @media print {
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section { padding: 60px 70px; }
   }
 </style>
 </head>
