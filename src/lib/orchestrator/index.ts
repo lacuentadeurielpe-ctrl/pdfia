@@ -1,8 +1,6 @@
 import { getQualityModels, type Calidad } from "./models";
 import { runDirector } from "./director";
-import { researchChapter } from "./researcher";
 import { writeSection } from "./writer";
-import { integrateChapter } from "./integrator";
 import { runEditor } from "./editor";
 import { generateImage } from "./image-agent";
 import type { Outline, Section, BookContext } from "./parser";
@@ -82,81 +80,41 @@ export async function runOrchestrator(
   // Cada capítulo ocupa aprox (75 / totalSections) % del progreso total
   const progressPerChapter = Math.floor(68 / totalSections);
 
-  // Estándar: solo Writer (1 llamada/cap)
-  // Avanzado:  Researcher + Writer (2 llamadas/cap)
-  // Premium:   Researcher + Writer + Integrador (3 llamadas/cap)
-  const useResearcher  = calidad === "avanzado" || calidad === "premium";
-  const useIntegrator  = calidad === "premium";
-
+  // Todos los niveles usan el ciclo de continuidad:
+  // Writer recibe el BookContext completo de capítulos anteriores.
+  // La calidad se diferencia por el modelo y el presupuesto de tokens, no por cantidad de agentes.
   for (let i = 0; i < outline.sections.length; i++) {
     const section = outline.sections[i];
     const baseProgress = 12 + i * progressPerChapter;
 
-    // ── Investigador (DeepSeek) — Avanzado y Premium ──
-    let research = "";
-    if (useResearcher) {
-      emit({
-        phase: "escribiendo",
-        message: `🔍 Investigando cap ${i + 1}/${totalSections}: "${section.title}" (${section.targetPages}p)`,
-        progress: baseProgress,
-      });
-      research = await researchChapter(
-        section,
-        outline,
-        bookContext,
-        models.writer,
-        models.researcherMaxTokens
-      );
-    }
-
-    // ── Escritor (DeepSeek) — todos los niveles ──
     emit({
       phase: "escribiendo",
       message: `✍️ Escribiendo cap ${i + 1}/${totalSections}: "${section.title}" (${section.targetPages}p)`,
-      progress: baseProgress + Math.floor(progressPerChapter * (useResearcher ? 0.4 : 0.2)),
+      progress: baseProgress,
     });
 
     const draft = await writeSection(
       section,
       outline,
       bookContext,
-      research,
+      "",          // sin researcher separado — contexto viene del BookContext
       models.writer,
       models.writerMaxTokens
     );
 
-    // ── Integrador/Revisor (Claude) — solo Premium ──
-    let finalSection: Section;
-    if (useIntegrator) {
-      emit({
-        phase: "escribiendo",
-        message: `🔧 Revisando e integrando cap ${i + 1}/${totalSections}: "${section.title}"`,
-        progress: baseProgress + Math.floor(progressPerChapter * 0.7),
-      });
-      finalSection = await integrateChapter(
-        draft,
-        section,
-        bookContext,
-        models.integrator,
-        models.integratorMaxTokens
-      );
-    } else {
-      finalSection = draft;
-    }
-
-    completedSections.push(finalSection);
+    completedSections.push(draft);
 
     // Actualizar BookContext con el capítulo completado
     bookContext.completedChapters.push({
       order:   section.order,
-      title:   finalSection.title,
+      title:   draft.title,
       summary: draft.chapterSummary,
     });
 
-    const wordCount = finalSection.content.split(/\s+/).length;
+    const wordCount = draft.content.split(/\s+/).length;
     emit({
       phase: "escribiendo",
-      message: `✅ Cap ${i + 1} listo — "${finalSection.title}" (~${wordCount} palabras)`,
+      message: `✅ Cap ${i + 1} listo — "${draft.title}" (~${wordCount} palabras)`,
       progress: baseProgress + progressPerChapter,
     });
   }

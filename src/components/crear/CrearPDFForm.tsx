@@ -7,32 +7,32 @@ const CALIDADES = [
   {
     id:    "estandar",
     label: "Estándar",
-    desc:  "Claude planifica, DeepSeek escribe. Excelente calidad. Recomendado para la mayoría.",
+    desc:  "Claude Haiku planifica, DeepSeek escribe. Cada capítulo conoce el anterior. Excelente calidad.",
     icon:  Zap,
     badge: "Recomendado",
     time:  "~3-5 min",
     color: "indigo",
-    agents: "Director + Escritor",
+    detail: "Haiku · ~2000 palabras/cap",
   },
   {
     id:    "avanzado",
     label: "Avanzado",
-    desc:  "Agente investigador por capítulo. Más ejemplos reales, datos y casos prácticos.",
+    desc:  "Claude Sonnet planifica con mayor razonamiento. Capítulos más largos y detallados.",
     icon:  Star,
     badge: "Popular",
-    time:  "~6-9 min",
+    time:  "~5-8 min",
     color: "purple",
-    agents: "Director + Investigador + Escritor",
+    detail: "Sonnet · ~3000 palabras/cap",
   },
   {
     id:    "premium",
     label: "Premium",
-    desc:  "Pipeline completo. Claude Opus revisa y expande cada capítulo hasta profundidad máxima.",
+    desc:  "Claude Opus planifica. DeepSeek escribe capítulos de máxima densidad y profundidad.",
     icon:  Crown,
     badge: "Pro",
-    time:  "~10-15 min",
+    time:  "~8-12 min",
     color: "amber",
-    agents: "Director + Investigador + Escritor + Revisor",
+    detail: "Opus · ~4000 palabras/cap",
   },
 ] as const;
 
@@ -142,7 +142,7 @@ export default function CrearPDFForm() {
                 </div>
                 <p className="text-white font-semibold text-sm mb-1">{c.label}</p>
                 <p className="text-gray-500 text-xs leading-relaxed">{c.desc}</p>
-                <p className={`text-xs mt-2 font-medium ${selected ? colors.icon : "text-gray-600"}`}>{c.time} · {c.agents}</p>
+                <p className={`text-xs mt-2 font-medium ${selected ? colors.icon : "text-gray-600"}`}>{c.time} · {c.detail}</p>
               </button>
             );
           })}

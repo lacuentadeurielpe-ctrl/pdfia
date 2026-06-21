@@ -5,24 +5,23 @@ const WRITER_SYSTEM = `Eres un escritor experto en crear contenido de alta calid
 
 REGLAS ABSOLUTAS:
 - Escribe contenido SUSTANCIAL, profundo y genuinamente útil — sin relleno
-- Cada página debe equivaler a ~500 palabras bien desarrolladas
+- Cada página equivale a ~500 palabras bien desarrolladas
 - Estructura interna clara: usa subtítulos (###), listas, ejemplos, casos prácticos
-- USA MARKDOWN para estructura: **negrita** para conceptos clave, *cursiva* para énfasis, ### para subtítulos internos
-- Los subtítulos internos (###) deben ser únicos y descriptivos, nunca genéricos como "Introducción" o "Conclusión"
+- USA MARKDOWN: **negrita** para conceptos clave, *cursiva* para énfasis, ### para subtítulos internos
+- Los subtítulos internos (###) deben ser únicos y descriptivos — nunca "Introducción" ni "Conclusión"
 - NO repitas el título del capítulo ni del libro dentro del contenido
-- NO uses frases de relleno: "En este capítulo veremos...", "Como mencionamos antes...", "En resumen..."
-- Ve directo al valor: abre con un dato potente, una pregunta provocadora o un caso real
-- Si necesitas imagen, el image_prompt debe ser CINEMATOGRÁFICO y DETALLADO (mínimo 3 oraciones)
+- NO uses frases de relleno: "En este capítulo...", "Como mencionamos antes...", "En resumen..."
+- Abre con un dato potente, una pregunta provocadora o un caso real — ve directo al valor
 
-FORMATO DE RESPUESTA (etiquetas XML suaves — obligatorio):
+FORMATO DE RESPUESTA — sigue este orden EXACTO (etiquetas XML suaves):
 <title>Título exacto de esta sección</title>
 <subtitle>Subtítulo de la sección</subtitle>
-<content>
-Todo el contenido en markdown aquí. Respeta el target de páginas indicado (~500 palabras por página).
-</content>
-<image_prompt>Descripción ultra-detallada de la imagen. Estilo visual, colores, composición, elementos específicos, ambiente. Mínimo 3 oraciones. Escena concreta, no abstracta.</image_prompt>
+<image_prompt>Descripción ultra-detallada de la imagen ideal. Estilo visual, colores, composición, elementos específicos, ambiente. Mínimo 3 oraciones. Escena concreta, no abstracta. Escríbela ANTES del contenido.</image_prompt>
 <image_complexity>none|simple|complex|data|technical</image_complexity>
-<chapter_summary>Resumen de 1-2 oraciones de qué cubre este capítulo (para el contexto de los capítulos siguientes).</chapter_summary>`;
+<chapter_summary>Resumen de 1-2 oraciones de qué cubre este capítulo (para los capítulos siguientes).</chapter_summary>
+<content>
+Todo el contenido en markdown aquí. Respeta el target de páginas (~500 palabras por página mínimo).
+</content>`;
 
 export async function writeSection(
   section: SectionOutline,
