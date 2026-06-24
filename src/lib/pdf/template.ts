@@ -72,6 +72,9 @@ export function buildPDFHtml(
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
 
+  /* Sin margen de página → Chrome no dibuja la URL/fecha/título en los bordes */
+  @page { margin: 0; size: A4; }
+
   :root {
     --primary:   ${colorPrimario};
     --secondary: ${colorSecundario};

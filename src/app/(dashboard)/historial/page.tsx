@@ -62,16 +62,28 @@ export default async function HistorialPage() {
                   )}
                 </div>
               </div>
-              <a
-                href={pdf.storage_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700
-                           text-white text-sm px-4 py-2 rounded-lg transition-colors flex-shrink-0"
-              >
-                <Download className="w-4 h-4" />
-                Descargar
-              </a>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <a
+                  href={`/preview/${pdf.proyecto_id}?print=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500
+                             text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Guardar PDF
+                </a>
+                <a
+                  href={`/preview/${pdf.proyecto_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700
+                             text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  Ver
+                </a>
+              </div>
             </div>
           ))}
         </div>
