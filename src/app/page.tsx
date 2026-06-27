@@ -31,19 +31,28 @@ const PASOS = [
 
 const PLANES = [
   {
-    nombre: "Estándar", precio: "Gratis", periodo: "para empezar", destacado: false,
-    desc: "Ideal para probar y crear tus primeros documentos.",
-    features: ["Ebooks de calidad profesional", "Continuidad entre capítulos", "Exportación a PDF", "Imágenes IA incluidas"],
+    nombre: "Gratis", precio: "S/ 0", periodo: "/mes", destacado: false,
+    badge: null,
+    desc: "Para probar y crear tus primeros ebooks.",
+    features: ["~5 ebooks/mes", "Calidad Estándar", "Hasta 5 capítulos", "Historial 7 días", "Marca de agua FoxPDF", "Licencia comercial"],
   },
   {
-    nombre: "Avanzado", precio: "Pro", periodo: "mayor profundidad", destacado: true,
-    desc: "Para creadores que venden contenido y necesitan más detalle.",
-    features: ["Todo lo de Estándar", "Capítulos más extensos y detallados", "Mayor razonamiento de IA", "Más ejemplos y casos reales"],
+    nombre: "Emprendedor", precio: "S/ 45", periodo: "/mes", destacado: false,
+    badge: null,
+    desc: "Para creadores que publican contenido regularmente.",
+    features: ["~20 ebooks/mes", "Calidad Estándar + Avanzado", "Imágenes IA incluidas", "Hasta 10 capítulos", "Historial ilimitado", "Tu marca y colores", "Licencia comercial"],
   },
   {
-    nombre: "Premium", precio: "Pro+", periodo: "máxima calidad", destacado: false,
-    desc: "Para documentos densos, educativos o de venta premium.",
-    features: ["Todo lo de Avanzado", "Profundidad y densidad máximas", "Imágenes de mayor calidad", "Prioridad de generación"],
+    nombre: "Profesional", precio: "S/ 89", periodo: "/mes", destacado: true,
+    badge: "MÁS POPULAR",
+    desc: "Para agencias y creadores de contenido premium.",
+    features: ["~50 ebooks/mes", "Calidad Estándar + Avanzado + Premium", "Imágenes IA de alta calidad", "Hasta 12 capítulos", "Historial ilimitado", "Tu marca y colores", "Soporte prioritario", "Licencia comercial"],
+  },
+  {
+    nombre: "Agencia", precio: "S/ 189", periodo: "/mes", destacado: false,
+    badge: null,
+    desc: "Volumen máximo para equipos y agencias digitales.",
+    features: ["~125 ebooks/mes", "Todas las calidades", "Imágenes IA máxima calidad", "Hasta 15 capítulos", "Historial ilimitado", "Tu marca y colores", "Soporte dedicado", "Licencia comercial"],
   },
 ];
 
@@ -175,29 +184,29 @@ export default async function LandingPage() {
       {/* ───── PRECIOS ───── */}
       <section id="precios" className="max-w-7xl mx-auto px-5 lg:px-8 py-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Elige tu nivel de calidad</h2>
-          <p className="text-gray-400 mt-4 text-lg">Todos los planes producen documentos profesionales. Mayor calidad = más profundidad.</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Planes y precios</h2>
+          <p className="text-gray-400 mt-4 text-lg">Todos los planes incluyen licencia comercial. Los créditos se renuevan cada mes.</p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6 items-stretch">
+        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-5 items-stretch">
           {PLANES.map((plan) => (
             <div key={plan.nombre}
-              className={`relative rounded-2xl p-7 flex flex-col ${
+              className={`relative rounded-2xl p-6 flex flex-col ${
                 plan.destacado
                   ? "bg-gradient-to-b from-orange-600/10 to-gray-900 border-2 border-orange-500/40"
                   : "bg-gray-900 border border-gray-800"
               }`}>
-              {plan.destacado && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                  MÁS POPULAR
+              {plan.badge && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                  {plan.badge}
                 </span>
               )}
               <h3 className="text-white font-bold text-lg">{plan.nombre}</h3>
-              <div className="mt-3 mb-1">
+              <div className="mt-3 mb-1 flex items-baseline gap-1">
                 <span className="text-3xl font-extrabold text-white">{plan.precio}</span>
-                <span className="text-gray-400 text-sm ml-2">{plan.periodo}</span>
+                <span className="text-gray-400 text-sm">{plan.periodo}</span>
               </div>
               <p className="text-gray-400 text-sm mb-5">{plan.desc}</p>
-              <ul className="space-y-3 mb-7 flex-1">
+              <ul className="space-y-2.5 mb-7 flex-1">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
                     <Check className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
@@ -205,17 +214,20 @@ export default async function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Link href={isAuth ? "/dashboard" : "/registro"}
+              <Link href={isAuth ? (plan.precio === "S/ 0" ? "/dashboard" : "/planes") : "/registro"}
                 className={`text-center font-semibold py-3 rounded-xl transition-colors ${
                   plan.destacado
                     ? "bg-orange-600 hover:bg-orange-500 text-white"
                     : "border border-gray-700 hover:border-gray-600 text-white"
                 }`}>
-                Empezar ahora
+                {plan.precio === "S/ 0" ? "Empezar gratis" : "Elegir plan"}
               </Link>
             </div>
           ))}
         </div>
+        <p className="text-center text-xs text-gray-600 mt-6">
+          Pagos seguros vía MercadoPago · Precios en soles peruanos (PEN) · Cancela cuando quieras
+        </p>
       </section>
 
       {/* ───── FAQ ───── */}
