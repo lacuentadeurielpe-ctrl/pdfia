@@ -39,7 +39,7 @@ const PLANES = [
     destacado: false,
     badge: null,
     color: "gray",
-    ebooksMes: "~5",
+    ebooksMes: "5",
     desc: "Ideal para probar FoxPDF sin compromiso.",
     includes: [
       "5 créditos/mes",
@@ -58,7 +58,7 @@ const PLANES = [
     destacado: false,
     badge: null,
     color: "indigo",
-    ebooksMes: "~20",
+    ebooksMes: "120",
     desc: "Para creadores que venden contenido digital.",
     includes: [
       "120 créditos/mes",
@@ -80,7 +80,7 @@ const PLANES = [
     destacado: true,
     badge: "MÁS POPULAR",
     color: "orange",
-    ebooksMes: "~50",
+    ebooksMes: "300",
     desc: "Para agencias y creadores de contenido premium.",
     includes: [
       "300 créditos/mes",
@@ -102,7 +102,7 @@ const PLANES = [
     destacado: false,
     badge: null,
     color: "amber",
-    ebooksMes: "~125",
+    ebooksMes: "750",
     desc: "Volumen máximo para equipos y agencias digitales.",
     includes: [
       "750 créditos/mes",
@@ -319,8 +319,9 @@ export default async function LandingPage() {
 
                     {/* Métrica clave */}
                     <div className={`rounded-xl bg-gray-800/60 border border-gray-700/50 px-4 py-3 mb-5 text-center`}>
-                      <p className={`text-2xl font-black ${colorAccent.num}`}>{plan.ebooksMes}</p>
-                      <p className="text-gray-500 text-xs mt-0.5">ebooks/mes estimados</p>
+                      <p className="text-gray-500 text-xs mb-1">hasta</p>
+                      <p className={`text-2xl font-black ${colorAccent.num}`}>{plan.ebooksMes} PDFs</p>
+                      <p className="text-gray-500 text-xs mt-0.5">al mes (sin imágenes)</p>
                     </div>
 
                     {/* CTA */}
