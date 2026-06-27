@@ -1,13 +1,31 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_ROUTES = ["/login", "/api/auth", "/_next", "/favicon.ico"];
+// Rutas públicas exactas (sin sesión)
+const PUBLIC_EXACT = ["/"];
+// Prefijos públicos: landing, legales, auth y assets
+const PUBLIC_PREFIX = [
+  "/login",
+  "/registro",
+  "/privacidad",
+  "/terminos",
+  "/cookies",
+  "/eliminacion-datos",
+  "/contacto",
+  "/nosotros",
+  "/api/auth",
+  "/api/contacto",
+  "/_next",
+  "/favicon.ico",
+];
 
 // Cookie que Supabase SSR establece al autenticar
 const SUPABASE_AUTH_COOKIE = `sb-acekctqfxzmwiumvcfht-auth-token`;
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isPublic = PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
+  const isPublic =
+    PUBLIC_EXACT.includes(pathname) ||
+    PUBLIC_PREFIX.some((r) => pathname.startsWith(r));
 
   // Verificar si existe la cookie de sesión de Supabase
   const hasSession =
@@ -18,7 +36,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (hasSession && pathname === "/login") {
+  // Usuarios con sesión: login/registro los mandamos al panel
+  if (hasSession && (pathname === "/login" || pathname === "/registro")) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

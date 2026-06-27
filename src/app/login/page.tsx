@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { FoxLogo } from "@/components/marketing/FoxLogo";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("lacuentadeurielpe@gmail.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -30,13 +32,10 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo / Brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600 mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-white">PDFIA</h1>
+          <Link href="/" className="inline-flex items-center gap-2.5 mb-3">
+            <FoxLogo className="w-12 h-12" />
+            <span className="text-3xl font-extrabold text-white">Fox<span className="text-orange-500">PDF</span></span>
+          </Link>
           <p className="text-gray-400 mt-1 text-sm">Creador de documentos con Inteligencia Artificial</p>
         </div>
 
@@ -84,7 +83,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800
+              className="w-full bg-orange-600 hover:bg-orange-500 disabled:bg-orange-900
                          disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl
                          transition-colors text-sm mt-2"
             >
@@ -93,8 +92,11 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-gray-600 text-xs mt-6">
-          PDFIA — Sistema de PDFs con IA Multi-Agente
+        <p className="text-center text-gray-500 text-sm mt-6">
+          ¿No tienes cuenta? <Link href="/registro" className="text-orange-400 hover:text-orange-300 font-medium">Regístrate gratis</Link>
+        </p>
+        <p className="text-center text-gray-700 text-xs mt-3">
+          <Link href="/" className="hover:text-gray-500">← Volver al inicio</Link>
         </p>
       </div>
     </div>
