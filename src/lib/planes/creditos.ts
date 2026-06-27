@@ -35,24 +35,37 @@ export async function getOrCreateSuscripcion(userId: string): Promise<EstadoCred
     .eq("user_id", userId)
     .single();
 
-  // 2. Crear si no existe (plan gratis)
+  // 2. Crear si no existe (plan gratis) — upsert para evitar error en concurrent requests
   if (!sus) {
     const gratis = getPlan("gratis");
     const ahora = new Date();
     const fin = new Date(ahora.getTime() + 30 * 24 * 60 * 60 * 1000);
     const { data: nueva } = await admin
       .from("suscripciones")
-      .insert({
-        user_id:          userId,
-        plan:             "gratis",
-        creditos_totales: gratis.creditos,
-        creditos_usados:  0,
-        ciclo_inicio:     ahora.toISOString(),
-        ciclo_fin:        fin.toISOString(),
-      })
+      .upsert(
+        {
+          user_id:          userId,
+          plan:             "gratis",
+          creditos_totales: gratis.creditos,
+          creditos_usados:  0,
+          ciclo_inicio:     ahora.toISOString(),
+          ciclo_fin:        fin.toISOString(),
+        },
+        { onConflict: "user_id", ignoreDuplicates: true }
+      )
       .select("user_id, plan, creditos_totales, creditos_usados, ciclo_inicio, ciclo_fin")
       .single();
-    sus = nueva;
+    // Si ignoreDuplicates=true y ya existía, re-fetch
+    if (!nueva) {
+      const { data: refetch } = await admin
+        .from("suscripciones")
+        .select("user_id, plan, creditos_totales, creditos_usados, ciclo_inicio, ciclo_fin")
+        .eq("user_id", userId)
+        .single();
+      sus = refetch;
+    } else {
+      sus = nueva;
+    }
   }
 
   let suscripcion = sus as Suscripcion;
@@ -95,21 +108,16 @@ export async function verificarCreditos(
 }
 
 /**
- * Descuenta créditos tras una generación (suma a creditos_usados de forma atómica).
+ * Descuenta créditos tras una generación — update atómico vía RPC (evita race condition).
  */
 export async function descontarCreditos(userId: string, cantidad: number): Promise<void> {
   if (cantidad <= 0) return;
   const admin = createAdminClient();
-  const { data: sus } = await admin
-    .from("suscripciones")
-    .select("creditos_usados")
-    .eq("user_id", userId)
-    .single();
-  const usadosActual = (sus?.creditos_usados ?? 0) as number;
-  await admin
-    .from("suscripciones")
-    .update({ creditos_usados: usadosActual + cantidad, updated_at: new Date().toISOString() })
-    .eq("user_id", userId);
+  const { error } = await admin.rpc("incrementar_creditos_usados", {
+    uid: userId,
+    cantidad,
+  });
+  if (error) console.error("[creditos] Error descontando créditos:", error.message);
 }
 
 /**

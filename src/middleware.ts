@@ -14,6 +14,7 @@ const PUBLIC_PREFIX = [
   "/nosotros",
   "/api/auth",
   "/api/contacto",
+  "/api/pagos/webhook",
   "/_next",
   "/favicon.ico",
 ];
