@@ -22,6 +22,33 @@ Sin texto superpuesto. Sin marcos ni bordes. Fondo apropiado para el tema.
 Calidad fotográfica o ilustrativa premium, estilo editorial.`;
 }
 
+// Intenta generar la imagen con UN modelo. Devuelve el base64 o null.
+async function intentarModelo(
+  ai: GoogleGenAI,
+  model: string,
+  finalPrompt: string,
+  sectionOrder: number
+): Promise<{ data: string; mime: string } | null> {
+  try {
+    const res = await ai.models.generateContent({
+      model,
+      contents: [{ role: "user", parts: [{ text: finalPrompt }] }],
+      config: { responseModalities: ["TEXT", "IMAGE"] },
+    });
+    const parts = res.candidates?.[0]?.content?.parts ?? [];
+    for (const part of parts) {
+      if (part.inlineData?.data) {
+        return { data: part.inlineData.data, mime: part.inlineData.mimeType ?? "image/png" };
+      }
+    }
+    console.warn(`[image-agent] ${model} no devolvió imagen (sección ${sectionOrder})`);
+    return null;
+  } catch (err) {
+    console.warn(`[image-agent] ${model} falló (sección ${sectionOrder}): ${err instanceof Error ? err.message : err}`);
+    return null;
+  }
+}
+
 export async function generateImage(
   imagePrompt: string,
   imageComplexity: ImageComplexity,
@@ -30,14 +57,15 @@ export async function generateImage(
   sectionOrder: number,
   brandColors: { primario: string; secundario: string; acento: string },
   style: string,
-  imageModel: string = DEFAULT_IMAGE_MODEL
+  imageModels: string | string[] = DEFAULT_IMAGE_MODEL
 ): Promise<string | null> {
   if (imageComplexity === "none" || !imagePrompt.trim()) {
-    console.log(`[image-agent] Sección ${sectionOrder} omitida — complexity=${imageComplexity}, prompt="${imagePrompt.slice(0, 40)}"`);
+    console.log(`[image-agent] Sección ${sectionOrder} omitida — complexity=${imageComplexity}`);
     return null;
   }
 
-  const model = imageModel;
+  // Acepta un modelo o una lista (vía con fallback)
+  const modelos = Array.isArray(imageModels) ? imageModels : [imageModels];
   const finalPrompt = enrichPrompt(imagePrompt, sectionTitle, brandColors, style);
 
   const apiKey =
@@ -50,56 +78,42 @@ export async function generateImage(
     return null;
   }
 
-  console.log(`[image-agent] Generando imagen sección ${sectionOrder} con ${model} — "${sectionTitle}"`);
+  const ai = new GoogleGenAI({ apiKey });
 
+  // Probar cada modelo de la vía en orden hasta que uno entregue imagen
+  let imagen: { data: string; mime: string } | null = null;
+  for (const model of modelos) {
+    console.log(`[image-agent] Sección ${sectionOrder} — intentando ${model} ("${sectionTitle}")`);
+    imagen = await intentarModelo(ai, model, finalPrompt, sectionOrder);
+    if (imagen) break;
+  }
+
+  if (!imagen) {
+    console.error(`[image-agent] Ningún modelo entregó imagen para sección ${sectionOrder}`);
+    return null;
+  }
+
+  // Subir a Supabase Storage
   try {
-    const ai = new GoogleGenAI({ apiKey });
-    const res = await ai.models.generateContent({
-      model,
-      contents: [{ role: "user", parts: [{ text: finalPrompt }] }],
-      config: { responseModalities: ["TEXT", "IMAGE"] },
-    });
-
-    // Extraer imagen base64
-    let imageBase64: string | null = null;
-    let mimeType = "image/png";
-
-    const parts = res.candidates?.[0]?.content?.parts ?? [];
-    console.log(`[image-agent] Respuesta: ${parts.length} partes`);
-
-    for (const part of parts) {
-      if (part.inlineData?.data) {
-        imageBase64 = part.inlineData.data;
-        mimeType = part.inlineData.mimeType ?? "image/png";
-        break;
-      }
-    }
-
-    if (!imageBase64) {
-      console.warn(`[image-agent] Gemini no devolvió imagen base64 para sección ${sectionOrder}`);
-      return null;
-    }
-
-    // Subir a Supabase Storage
     const supabase = createAdminClient();
-    const ext = mimeType.includes("jpeg") ? "jpg" : "png";
+    const ext = imagen.mime.includes("jpeg") ? "jpg" : "png";
     const path = `${projectId}/section-${sectionOrder}.${ext}`;
-    const buffer = Buffer.from(imageBase64, "base64");
+    const buffer = Buffer.from(imagen.data, "base64");
 
     const { error: uploadError } = await supabase.storage
       .from("imagenes-ia")
-      .upload(path, buffer, { contentType: mimeType, upsert: true });
+      .upload(path, buffer, { contentType: imagen.mime, upsert: true });
 
     if (uploadError) {
-      console.error(`[image-agent] Error subiendo imagen a Supabase: ${uploadError.message}`);
+      console.error(`[image-agent] Error subiendo a Supabase: ${uploadError.message}`);
       return null;
     }
 
     const { data } = supabase.storage.from("imagenes-ia").getPublicUrl(path);
-    console.log(`[image-agent] ✅ Imagen lista: ${data.publicUrl.slice(0, 80)}...`);
+    console.log(`[image-agent] ✅ Imagen lista sección ${sectionOrder}`);
     return data.publicUrl;
   } catch (err) {
-    console.error(`[image-agent] Error sección ${sectionOrder}:`, err instanceof Error ? err.message : JSON.stringify(err));
+    console.error(`[image-agent] Error subiendo sección ${sectionOrder}:`, err instanceof Error ? err.message : err);
     return null;
   }
 }

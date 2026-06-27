@@ -6,12 +6,29 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 export type ModelProvider = "gemini" | "deepseek" | "claude" | "openai";
 export type Calidad = "estandar" | "avanzado" | "premium";
 
+// ── Vías de imagen con fallback (se prueban en orden hasta que una funcione) ──
+export const VIAS_IMAGEN = {
+  flash: [
+    "gemini-2.5-flash-image",        // primario (se apaga 02-oct-2026)
+    "gemini-3.1-flash-image",        // sucesor
+    "gemini-3.1-flash-image-preview",
+  ],
+  pro: [
+    "gemini-3-pro-image",            // máxima calidad
+    "gemini-3-pro-image-preview",
+    "nano-banana-pro-preview",
+    "gemini-2.5-flash-image",        // último recurso
+  ],
+} as const;
+
+export type ViaImagen = keyof typeof VIAS_IMAGEN;
+
 export interface QualityModels {
   director: string;          // Claude — razonamiento y planificación
   writer: string;            // DeepSeek — redacción económica de alta calidad
   integrator: string;        // Claude — revisión y expansión de capítulos
   editor: string;            // Claude — revisión global final
-  imageModel: string;        // Gemini — generación de imágenes
+  imageModels: string[];     // Gemini — vía de imagen con fallback
   writerMaxTokens: number;
   integratorMaxTokens: number;
   researcherMaxTokens: number;
@@ -25,7 +42,7 @@ export function getQualityModels(calidad: Calidad): QualityModels {
         writer:                "deepseek-chat",
         integrator:            "claude-opus-4-8",
         editor:                "claude-sonnet-4-6",
-        imageModel:            "gemini-3-pro-image",
+        imageModels:           [...VIAS_IMAGEN.pro],   // imágenes de máxima calidad
         writerMaxTokens:       8000,
         integratorMaxTokens:   6000,
         researcherMaxTokens:   2500,
@@ -36,7 +53,7 @@ export function getQualityModels(calidad: Calidad): QualityModels {
         writer:                "deepseek-chat",
         integrator:            "claude-sonnet-4-6",
         editor:                "claude-haiku-4-5-20251001",
-        imageModel:            "gemini-2.5-flash-image",
+        imageModels:           [...VIAS_IMAGEN.flash],
         writerMaxTokens:       6000,
         integratorMaxTokens:   4000,
         researcherMaxTokens:   2000,
@@ -47,7 +64,7 @@ export function getQualityModels(calidad: Calidad): QualityModels {
         writer:                "deepseek-chat",
         integrator:            "claude-haiku-4-5-20251001",
         editor:                "claude-haiku-4-5-20251001",
-        imageModel:            "gemini-2.5-flash-image",
+        imageModels:           [...VIAS_IMAGEN.flash],
         writerMaxTokens:       4000,
         integratorMaxTokens:   3000,
         researcherMaxTokens:   1500,

@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { runResumable, type OrchestratorEvent } from "@/lib/orchestrator/resumable";
+import { getOrCreateSuscripcion } from "@/lib/planes/creditos";
 
 export const maxDuration = 300; // Hobby cap; Vercel rechaza valores mayores
 export const dynamic = "force-dynamic";
@@ -79,9 +80,15 @@ export async function GET(
           colorAcento:     config?.color_acento ?? "#06b6d4",
         };
 
+        // Plan del usuario → decide la marca de agua y si puede usar su propia marca
+        const { plan } = await getOrCreateSuscripcion(user.id);
+        const brandFinal = plan.marcaPersonalizada
+          ? brand
+          : { ...brand, nombreNegocio: "FoxPDF", logoUrl: null }; // plan gratis: sin marca propia
+
         const result = await runResumable(
           supabaseAdmin,
-          { proyecto, brand, userId: user.id },
+          { proyecto, brand: brandFinal, userId: user.id, marcaDeAgua: plan.marcaDeAgua },
           emit
         );
 

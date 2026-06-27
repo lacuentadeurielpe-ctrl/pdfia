@@ -3,6 +3,8 @@ import { runDirector } from "./director";
 import { writeSection } from "./writer";
 import { generateImage } from "./image-agent";
 import { buildPDFHtml } from "@/lib/pdf/template";
+import { costoReal } from "@/lib/planes/config";
+import { descontarCreditos } from "@/lib/planes/creditos";
 import type { Outline, Section, BookContext } from "./parser";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -45,6 +47,7 @@ interface ResumableInput {
   };
   brand: Brand;
   userId: string;
+  marcaDeAgua: boolean;
 }
 
 interface StoredChapter {
@@ -230,7 +233,7 @@ export async function runResumable(
 
       await emit({
         phase: "generando_imagenes",
-        message: `🎨 Generando ${pending.length} imágenes en paralelo [${models.imageModel}]...`,
+        message: `🎨 Generando ${pending.length} imágenes en paralelo [${models.imageModels[0]}]...`,
         progress: 78,
       });
 
@@ -245,7 +248,7 @@ export async function runResumable(
             c.orden,
             { primario: brand.colorPrimario, secundario: brand.colorSecundario, acento: brand.colorAcento },
             outline!.style,
-            models.imageModel
+            models.imageModels
           );
           if (url) {
             await supabaseAdmin
@@ -283,7 +286,7 @@ export async function runResumable(
       imageUrl:        c.image_url ?? undefined,
     }));
 
-  const htmlContent = buildPDFHtml(outline, sections, brand);
+  const htmlContent = buildPDFHtml(outline, sections, brand, input.marcaDeAgua);
   const htmlBytes = Buffer.from(htmlContent, "utf-8");
   const fileName = `${projectId}/${Date.now()}.html`;
 
@@ -303,11 +306,21 @@ export async function runResumable(
     storage_url:        urlData.publicUrl,
     tamano_bytes:       htmlBytes.length,
     modelo_ia:          `multi-provider:${calidad}`,
-    modelo_imagen:      generateImages ? models.imageModel : null,
+    modelo_imagen:      generateImages ? models.imageModels[0] : null,
     imagenes_generadas: imagesCount,
   });
 
   await setPaso("completado", "completado");
+
+  // ── Descontar créditos por el costo REAL (texto + imágenes generadas) ──
+  // Se ejecuta una sola vez: el endpoint corta antes si el proyecto ya está completado.
+  try {
+    const costo = costoReal(calidad, imagesCount);
+    await descontarCreditos(input.userId, costo);
+    console.log(`[resumable] Descontados ${costo} créditos a ${input.userId} (${imagesCount} imágenes)`);
+  } catch (e) {
+    console.error("[resumable] No se pudieron descontar créditos:", e);
+  }
 
   const totalWords = sections.reduce((sum, s) => sum + s.content.split(/\s+/).length, 0);
   await emit({

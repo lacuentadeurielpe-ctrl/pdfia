@@ -36,7 +36,8 @@ function hexToRgb(hex: string): string {
 export function buildPDFHtml(
   outline: Outline,
   sections: Section[],
-  brand: BrandConfig
+  brand: BrandConfig,
+  marcaDeAgua: boolean = false
 ): string {
   const { colorPrimario, colorSecundario, colorAcento, nombreNegocio, logoUrl } = brand;
   const rgbPrimario = hexToRgb(colorPrimario);
@@ -60,6 +61,7 @@ export function buildPDFHtml(
       </div>
       ${imageBlock}
       <div class="section-content"><p>${contentHtml}</p></div>
+      ${marcaDeAgua ? `<div class="wm-footer">Creado con FoxPDF · foxpdf.cloud</div>` : ""}
     </div>`;
     })
     .join("\n");
@@ -370,6 +372,27 @@ export function buildPDFHtml(
     margin: 24px 0;
   }
 
+  /* ── MARCA DE AGUA (plan gratuito) ── */
+  .wm-cover {
+    position: absolute;
+    bottom: 24px;
+    right: 80px;
+    color: rgba(255,255,255,0.6);
+    font-size: 9pt;
+    letter-spacing: 1px;
+    z-index: 2;
+  }
+  .wm-footer {
+    text-align: center;
+    font-size: 8pt;
+    color: var(--text-muted);
+    opacity: 0.55;
+    margin-top: 36px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    letter-spacing: 0.5px;
+  }
+
   @media print {
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .section { padding: 60px 70px; }
@@ -389,6 +412,7 @@ export function buildPDFHtml(
   <div class="cover-line"></div>
   <p class="cover-subtitle">${outline.bookSubtitle}</p>
   <div class="cover-date">${new Date().toLocaleDateString("es-PE", { year: "numeric", month: "long" })}</div>
+  ${marcaDeAgua ? `<div class="wm-cover">Creado con FoxPDF · foxpdf.cloud</div>` : ""}
 </div>
 
 <!-- TABLA DE CONTENIDOS -->
