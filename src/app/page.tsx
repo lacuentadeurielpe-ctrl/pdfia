@@ -6,6 +6,7 @@ import { FoxLogo } from "@/components/marketing/FoxLogo";
 import {
   Sparkles, FileText, ImageIcon, Layers, Zap, ShieldCheck,
   Wand2, BookOpen, Check, ArrowRight, Star, Brain, Palette,
+  X, CreditCard, RefreshCw, Lock,
 } from "lucide-react";
 
 export const metadata = {
@@ -31,28 +32,89 @@ const PASOS = [
 
 const PLANES = [
   {
-    nombre: "Gratis", precio: "S/ 0", periodo: "/mes", destacado: false,
+    id: "gratis",
+    nombre: "Gratis",
+    precio: "S/ 0",
+    periodo: "/mes",
+    destacado: false,
     badge: null,
-    desc: "Para probar y crear tus primeros ebooks.",
-    features: ["~5 ebooks/mes", "Calidad Estándar", "Hasta 5 capítulos", "Historial 7 días", "Marca de agua FoxPDF", "Licencia comercial"],
+    color: "gray",
+    ebooksMes: "~5",
+    desc: "Ideal para probar FoxPDF sin compromiso.",
+    includes: [
+      "5 créditos/mes",
+      "Calidad Estándar (Claude Haiku)",
+      "Hasta 5 capítulos por ebook",
+      "Historial 7 días",
+      "Licencia comercial",
+    ],
+    excludes: ["Imágenes IA", "Tu marca y colores", "Calidad Avanzado / Premium"],
   },
   {
-    nombre: "Emprendedor", precio: "S/ 45", periodo: "/mes", destacado: false,
+    id: "emprendedor",
+    nombre: "Emprendedor",
+    precio: "S/ 45",
+    periodo: "/mes",
+    destacado: false,
     badge: null,
-    desc: "Para creadores que publican contenido regularmente.",
-    features: ["~20 ebooks/mes", "Calidad Estándar + Avanzado", "Imágenes IA incluidas", "Hasta 10 capítulos", "Historial ilimitado", "Tu marca y colores", "Licencia comercial"],
+    color: "indigo",
+    ebooksMes: "~20",
+    desc: "Para creadores que venden contenido digital.",
+    includes: [
+      "120 créditos/mes",
+      "Calidad Estándar + Avanzado",
+      "Imágenes IA incluidas (Gemini Flash)",
+      "Hasta 10 capítulos por ebook",
+      "Historial ilimitado",
+      "Tu marca, logo y colores",
+      "Soporte por email",
+      "Licencia comercial",
+    ],
+    excludes: ["Calidad Premium (Claude Opus)", "Imágenes IA Pro"],
   },
   {
-    nombre: "Profesional", precio: "S/ 89", periodo: "/mes", destacado: true,
+    id: "profesional",
+    nombre: "Profesional",
+    precio: "S/ 89",
+    periodo: "/mes",
+    destacado: true,
     badge: "MÁS POPULAR",
+    color: "orange",
+    ebooksMes: "~50",
     desc: "Para agencias y creadores de contenido premium.",
-    features: ["~50 ebooks/mes", "Calidad Estándar + Avanzado + Premium", "Imágenes IA de alta calidad", "Hasta 12 capítulos", "Historial ilimitado", "Tu marca y colores", "Soporte prioritario", "Licencia comercial"],
+    includes: [
+      "300 créditos/mes",
+      "Todas las calidades (Estándar · Avanzado · Premium)",
+      "Imágenes IA Pro (Gemini alta calidad)",
+      "Hasta 12 capítulos por ebook",
+      "Historial ilimitado",
+      "Tu marca, logo y colores",
+      "Soporte prioritario",
+      "Licencia comercial",
+    ],
+    excludes: [],
   },
   {
-    nombre: "Agencia", precio: "S/ 189", periodo: "/mes", destacado: false,
+    id: "agencia",
+    nombre: "Agencia",
+    precio: "S/ 189",
+    periodo: "/mes",
+    destacado: false,
     badge: null,
+    color: "amber",
+    ebooksMes: "~125",
     desc: "Volumen máximo para equipos y agencias digitales.",
-    features: ["~125 ebooks/mes", "Todas las calidades", "Imágenes IA máxima calidad", "Hasta 15 capítulos", "Historial ilimitado", "Tu marca y colores", "Soporte dedicado", "Licencia comercial"],
+    includes: [
+      "750 créditos/mes",
+      "Todas las calidades (Estándar · Avanzado · Premium)",
+      "Imágenes IA Pro (máxima calidad)",
+      "Hasta 15 capítulos por ebook",
+      "Historial ilimitado",
+      "Tu marca, logo y colores",
+      "Soporte dedicado",
+      "Licencia comercial",
+    ],
+    excludes: [],
   },
 ];
 
@@ -182,52 +244,130 @@ export default async function LandingPage() {
       </section>
 
       {/* ───── PRECIOS ───── */}
-      <section id="precios" className="max-w-7xl mx-auto px-5 lg:px-8 py-20">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Planes y precios</h2>
-          <p className="text-gray-400 mt-4 text-lg">Todos los planes incluyen licencia comercial. Los créditos se renuevan cada mes.</p>
+      <section id="precios" className="py-24 relative overflow-hidden">
+        {/* fondo decorativo */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] bg-orange-600/6 rounded-full blur-[140px]" />
         </div>
-        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-5 items-stretch">
-          {PLANES.map((plan) => (
-            <div key={plan.nombre}
-              className={`relative rounded-2xl p-6 flex flex-col ${
-                plan.destacado
-                  ? "bg-gradient-to-b from-orange-600/10 to-gray-900 border-2 border-orange-500/40"
-                  : "bg-gray-900 border border-gray-800"
-              }`}>
-              {plan.badge && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
-                  {plan.badge}
-                </span>
-              )}
-              <h3 className="text-white font-bold text-lg">{plan.nombre}</h3>
-              <div className="mt-3 mb-1 flex items-baseline gap-1">
-                <span className="text-3xl font-extrabold text-white">{plan.precio}</span>
-                <span className="text-gray-400 text-sm">{plan.periodo}</span>
+
+        <div className="max-w-7xl mx-auto px-5 lg:px-8">
+          {/* Header */}
+          <div className="text-center max-w-3xl mx-auto mb-6">
+            <span className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 rounded-full px-4 py-1.5 mb-5 text-orange-300 text-xs font-semibold tracking-wide">
+              <CreditCard className="w-3.5 h-3.5" /> PRECIOS SIMPLES, SIN SORPRESAS
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              Paga solo por lo que usas.<br />
+              <span className="bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">Los créditos se renuevan cada mes.</span>
+            </h2>
+            <p className="text-gray-400 mt-5 text-lg max-w-xl mx-auto">
+              Un crédito = un ebook sin imágenes. Las imágenes IA suman 1-3 créditos extra según la calidad. Sin contratos, sin trampa.
+            </p>
+          </div>
+
+          {/* ¿Cuánto vale 1 crédito? */}
+          <div className="flex flex-wrap justify-center gap-4 mb-14">
+            {[
+              { label: "1 ebook sin imágenes", costo: "1 crédito" },
+              { label: "1 imagen Flash (Estándar/Avanzado)", costo: "+ 1 crédito" },
+              { label: "1 imagen Pro (Premium)", costo: "+ 3 créditos" },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-full px-4 py-2">
+                <span className="text-white font-semibold text-sm">{item.costo}</span>
+                <span className="text-gray-500 text-xs">·</span>
+                <span className="text-gray-400 text-xs">{item.label}</span>
               </div>
-              <p className="text-gray-400 text-sm mb-5">{plan.desc}</p>
-              <ul className="space-y-2.5 mb-7 flex-1">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-gray-300">
-                    <Check className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href={isAuth ? (plan.precio === "S/ 0" ? "/dashboard" : "/planes") : "/registro"}
-                className={`text-center font-semibold py-3 rounded-xl transition-colors ${
-                  plan.destacado
-                    ? "bg-orange-600 hover:bg-orange-500 text-white"
-                    : "border border-gray-700 hover:border-gray-600 text-white"
-                }`}>
-                {plan.precio === "S/ 0" ? "Empezar gratis" : "Elegir plan"}
-              </Link>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Cards */}
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-5 items-stretch">
+            {PLANES.map((plan) => {
+              const ACCENTS = {
+                gray:   { ring: "border-gray-700",    glow: "",                                  btn: "border border-gray-700 hover:border-gray-500 text-white",       badge: "bg-gray-700 text-gray-300",       num: "text-gray-400"   },
+                indigo: { ring: "border-indigo-700",  glow: "",                                  btn: "border border-indigo-600 hover:bg-indigo-600 text-white",       badge: "bg-indigo-700 text-indigo-200",   num: "text-indigo-400" },
+                orange: { ring: "border-orange-500/70",glow: "shadow-2xl shadow-orange-600/20",  btn: "bg-orange-600 hover:bg-orange-500 text-white",                  badge: "bg-orange-600 text-white",        num: "text-orange-400" },
+                amber:  { ring: "border-amber-600/60",glow: "",                                  btn: "border border-amber-600 hover:bg-amber-600/20 text-amber-300", badge: "bg-amber-700/60 text-amber-300",  num: "text-amber-400"  },
+              } as const;
+              const colorAccent = ACCENTS[plan.color as keyof typeof ACCENTS];
+
+              return (
+                <div
+                  key={plan.id}
+                  className={`relative rounded-2xl flex flex-col border-2 ${colorAccent.ring} ${colorAccent.glow} ${
+                    plan.destacado
+                      ? "bg-gradient-to-b from-orange-950/60 via-gray-900 to-gray-900"
+                      : "bg-gray-900"
+                  }`}
+                >
+                  {plan.badge && (
+                    <div className="absolute -top-3.5 left-0 right-0 flex justify-center">
+                      <span className={`text-xs font-bold px-4 py-1 rounded-full ${colorAccent.badge}`}>
+                        {plan.badge}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="p-6 pb-0">
+                    {/* Nombre + precio */}
+                    <p className="text-gray-400 text-xs font-semibold uppercase tracking-widest mb-1">{plan.nombre}</p>
+                    <div className="flex items-baseline gap-1 mb-1">
+                      <span className="text-4xl font-black text-white">{plan.precio}</span>
+                      <span className="text-gray-500 text-sm">{plan.periodo}</span>
+                    </div>
+                    <p className="text-gray-400 text-xs mb-4">{plan.desc}</p>
+
+                    {/* Métrica clave */}
+                    <div className={`rounded-xl bg-gray-800/60 border border-gray-700/50 px-4 py-3 mb-5 text-center`}>
+                      <p className={`text-2xl font-black ${colorAccent.num}`}>{plan.ebooksMes}</p>
+                      <p className="text-gray-500 text-xs mt-0.5">ebooks/mes estimados</p>
+                    </div>
+
+                    {/* CTA */}
+                    <Link
+                      href={isAuth ? (plan.id === "gratis" ? "/dashboard" : "/planes") : "/registro"}
+                      className={`w-full text-center font-bold py-3 rounded-xl transition-colors block mb-5 text-sm ${colorAccent.btn}`}
+                    >
+                      {plan.id === "gratis" ? "Empezar gratis" : `Elegir ${plan.nombre}`}
+                    </Link>
+                  </div>
+
+                  {/* Divisor */}
+                  <div className="mx-6 border-t border-gray-800 mb-5" />
+
+                  {/* Features */}
+                  <div className="px-6 pb-6 flex-1 flex flex-col">
+                    <ul className="space-y-2.5 flex-1">
+                      {plan.includes.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-xs text-gray-300">
+                          <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                          {f}
+                        </li>
+                      ))}
+                      {plan.excludes.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-xs text-gray-600">
+                          <X className="w-3.5 h-3.5 text-gray-700 flex-shrink-0 mt-0.5" />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Trust bar */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
+            <span className="flex items-center gap-2"><Lock className="w-4 h-4 text-gray-600" /> Pago seguro vía MercadoPago</span>
+            <span className="text-gray-700">·</span>
+            <span className="flex items-center gap-2"><RefreshCw className="w-4 h-4 text-gray-600" /> Créditos se renuevan el 1 de cada mes</span>
+            <span className="text-gray-700">·</span>
+            <span className="flex items-center gap-2"><Check className="w-4 h-4 text-gray-600" /> Cancela cuando quieras</span>
+            <span className="text-gray-700">·</span>
+            <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-gray-600" /> Todos los planes incluyen licencia comercial</span>
+          </div>
         </div>
-        <p className="text-center text-xs text-gray-600 mt-6">
-          Pagos seguros vía MercadoPago · Precios en soles peruanos (PEN) · Cancela cuando quieras
-        </p>
       </section>
 
       {/* ───── FAQ ───── */}
