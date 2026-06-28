@@ -58,7 +58,7 @@ export default function RegistroPage() {
           password,
           options: {
             data: { nombre },
-            emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin}/dashboard`,
+            emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin}/auth/callback`,
           },
         }),
         new Promise<{ data: null; error: null }>((resolve) =>

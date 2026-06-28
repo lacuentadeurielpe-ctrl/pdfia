@@ -6,6 +6,9 @@ const PUBLIC_EXACT = ["/"];
 const PUBLIC_PREFIX = [
   "/login",
   "/registro",
+  "/recuperar-password",
+  "/actualizar-password",
+  "/auth/callback",
   "/privacidad",
   "/terminos",
   "/cookies",
