@@ -82,9 +82,12 @@ export async function GET(
 
         // Plan del usuario → decide la marca de agua y si puede usar su propia marca
         const { plan } = await getOrCreateSuscripcion(user.id);
+
+        // Plan gratis: nombre, logo Y colores son de FoxPDF (no del usuario)
+        const DEFAULTS = { colorPrimario: "#6366f1", colorSecundario: "#8b5cf6", colorAcento: "#06b6d4" };
         const brandFinal = plan.marcaPersonalizada
           ? brand
-          : { ...brand, nombreNegocio: "FoxPDF", logoUrl: null }; // plan gratis: sin marca propia
+          : { nombreNegocio: "FoxPDF", logoUrl: null, ...DEFAULTS };
 
         const result = await runResumable(
           supabaseAdmin,

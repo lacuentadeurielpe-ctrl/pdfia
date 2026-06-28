@@ -1,7 +1,8 @@
 "use client";
 import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Upload, Save, Check } from "lucide-react";
+import { Upload, Save, Check, Lock, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 interface Config {
   id: string;
@@ -10,33 +11,33 @@ interface Config {
   color_primario: string;
   color_secundario: string;
   color_acento: string;
-  fuente_titulo: string;
-  fuente_cuerpo: string;
 }
 
 interface Props {
   config: Config | null;
   userId: string;
+  marcaPersonalizada: boolean;
+  planNombre: string;
 }
 
 const COLORES_PRESET = [
-  { name: "Índigo", primario: "#6366f1", secundario: "#8b5cf6", acento: "#06b6d4" },
-  { name: "Esmeralda", primario: "#10b981", secundario: "#059669", acento: "#f59e0b" },
-  { name: "Rosa", primario: "#ec4899", secundario: "#f43f5e", acento: "#8b5cf6" },
-  { name: "Naranja", primario: "#f97316", secundario: "#ef4444", acento: "#eab308" },
-  { name: "Azul", primario: "#3b82f6", secundario: "#1d4ed8", acento: "#06b6d4" },
-  { name: "Pizarra", primario: "#475569", secundario: "#334155", acento: "#6366f1" },
+  { name: "Índigo",     primario: "#6366f1", secundario: "#8b5cf6", acento: "#06b6d4" },
+  { name: "Esmeralda",  primario: "#10b981", secundario: "#059669", acento: "#f59e0b" },
+  { name: "Rosa",       primario: "#ec4899", secundario: "#f43f5e", acento: "#8b5cf6" },
+  { name: "Naranja",    primario: "#f97316", secundario: "#ef4444", acento: "#eab308" },
+  { name: "Azul",       primario: "#3b82f6", secundario: "#1d4ed8", acento: "#06b6d4" },
+  { name: "Pizarra",    primario: "#475569", secundario: "#334155", acento: "#6366f1" },
 ];
 
-export default function AjustesForm({ config, userId }: Props) {
-  const [nombre, setNombre] = useState(config?.nombre_negocio ?? "");
-  const [logoUrl, setLogoUrl] = useState(config?.logo_url ?? null);
-  const [primario, setPrimario] = useState(config?.color_primario ?? "#6366f1");
+export default function AjustesForm({ config, userId, marcaPersonalizada, planNombre }: Props) {
+  const [nombre, setNombre]         = useState(config?.nombre_negocio ?? "");
+  const [logoUrl, setLogoUrl]       = useState(config?.logo_url ?? null);
+  const [primario, setPrimario]     = useState(config?.color_primario ?? "#6366f1");
   const [secundario, setSecundario] = useState(config?.color_secundario ?? "#8b5cf6");
-  const [acento, setAcento] = useState(config?.color_acento ?? "#06b6d4");
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [acento, setAcento]         = useState(config?.color_acento ?? "#06b6d4");
+  const [saving, setSaving]         = useState(false);
+  const [saved, setSaved]           = useState(false);
+  const [uploading, setUploading]   = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -59,12 +60,12 @@ export default function AjustesForm({ config, userId }: Props) {
     setSaving(true);
     const supabase = createClient();
     await supabase.from("configuraciones_negocio").upsert({
-      user_id: userId,
-      nombre_negocio: nombre,
-      logo_url: logoUrl,
-      color_primario: primario,
+      user_id:          userId,
+      nombre_negocio:   nombre,
+      logo_url:         logoUrl,
+      color_primario:   primario,
       color_secundario: secundario,
-      color_acento: acento,
+      color_acento:     acento,
     }, { onConflict: "user_id" });
     setSaving(false);
     setSaved(true);
@@ -80,6 +81,25 @@ export default function AjustesForm({ config, userId }: Props) {
   return (
     <form onSubmit={handleSave} className="space-y-6">
 
+      {/* Aviso plan gratis */}
+      {!marcaPersonalizada && (
+        <div className="bg-amber-950/50 border border-amber-700/40 rounded-2xl px-5 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Lock className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            <div>
+              <p className="text-amber-300 text-sm font-medium">Plan {planNombre} — Marca bloqueada</p>
+              <p className="text-amber-400/70 text-xs mt-0.5">
+                Configura tu marca aquí. Se activará automáticamente cuando mejores al plan Emprendedor o superior.
+              </p>
+            </div>
+          </div>
+          <Link href="/planes"
+            className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 font-semibold flex-shrink-0 transition-colors">
+            Mejorar <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
+      )}
+
       {/* Nombre del negocio */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
         <h2 className="text-white font-semibold mb-4">Información básica</h2>
@@ -91,6 +111,9 @@ export default function AjustesForm({ config, userId }: Props) {
                      focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"
           placeholder="Ej: Marketing Pro Studio"
         />
+        <p className="text-gray-600 text-xs mt-2">
+          Aparece en la portada y en el eyebrow de cada capítulo del PDF.
+        </p>
       </div>
 
       {/* Logo */}
@@ -109,6 +132,9 @@ export default function AjustesForm({ config, userId }: Props) {
           <div>
             <p className="text-gray-300 text-sm mb-2">
               Sube tu logo en PNG, SVG o JPG (máx. 5MB)
+            </p>
+            <p className="text-gray-500 text-xs mb-3">
+              Se muestra en la portada del PDF junto al nombre del negocio.
             </p>
             <button
               type="button"
@@ -129,7 +155,9 @@ export default function AjustesForm({ config, userId }: Props) {
       {/* Colores */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
         <h2 className="text-white font-semibold mb-1">Paleta de colores</h2>
-        <p className="text-gray-500 text-xs mb-4">Se usarán en portadas, títulos y acentos de tus PDFs</p>
+        <p className="text-gray-500 text-xs mb-4">
+          Se aplican en la portada, títulos, acentos y también guían el estilo de las imágenes IA.
+        </p>
 
         {/* Presets */}
         <div className="flex gap-2 flex-wrap mb-5">
@@ -150,9 +178,9 @@ export default function AjustesForm({ config, userId }: Props) {
         {/* Pickers */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "Color primario", value: primario, onChange: setPrimario },
-            { label: "Color secundario", value: secundario, onChange: setSecundario },
-            { label: "Color acento", value: acento, onChange: setAcento },
+            { label: "Color primario",    value: primario,   onChange: setPrimario   },
+            { label: "Color secundario",  value: secundario, onChange: setSecundario },
+            { label: "Color acento",      value: acento,     onChange: setAcento     },
           ].map(({ label, value, onChange }) => (
             <div key={label}>
               <label className="block text-xs text-gray-400 mb-2">{label}</label>
