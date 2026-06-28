@@ -75,7 +75,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-800/60 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-gray-500 text-xs text-center md:text-left">
-            © {new Date().getFullYear()} {EMPRESA.nombre} · {EMPRESA.dueno} · RUC {EMPRESA.ruc}. Todos los derechos reservados.
+            © {new Date().getFullYear()} {EMPRESA.nombre} · RUC {EMPRESA.ruc} · Todos los derechos reservados.
           </p>
           <p className="text-gray-600 text-xs">{EMPRESA.dominio}</p>
         </div>
