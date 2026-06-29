@@ -58,7 +58,7 @@ export default function RegistroPage() {
           password,
           options: {
             data: { nombre },
-            emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin}/auth/callback`,
+            emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL ?? "https://foxpdf.cloud"}/auth/callback`,
           },
         }),
         new Promise<{ data: null; error: null }>((resolve) =>
