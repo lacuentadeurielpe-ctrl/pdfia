@@ -31,7 +31,14 @@ function LoginForm() {
     const supabase = createClient();
     const { error: err } = await supabase.auth.signInWithPassword({ email, password });
     if (err) {
-      setError("Correo o contraseña incorrectos. Verifica tus datos.");
+      const msg = err.message.toLowerCase();
+      if (msg.includes("email not confirmed")) {
+        setError("Debes confirmar tu correo antes de ingresar. Revisa tu bandeja de entrada (y la carpeta spam).");
+      } else if (msg.includes("invalid login") || msg.includes("invalid credentials") || msg.includes("user not found")) {
+        setError("Correo o contraseña incorrectos. Verifica tus datos.");
+      } else {
+        setError(err.message);
+      }
       setLoading(false);
       return;
     }
