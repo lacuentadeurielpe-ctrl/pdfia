@@ -58,7 +58,7 @@ export function buildMinimalista(
   --p:${colorPrimario};--s:${colorSecundario};--a:${colorAcento};--rp:${rgb};
   --text:#0f0f0f;--muted:#6b7280;--bg:#fff;--border:#e5e7eb;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 body{font-family:'Lora',serif;color:var(--text);background:var(--bg);font-size:11.5pt;line-height:1.85;}
 
 /* COVER — blanco puro, borde izquierdo de color, tipografía protagonista */

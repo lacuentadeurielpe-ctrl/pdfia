@@ -69,7 +69,7 @@ export function buildTecnico(
   --text:#e2e8f0;--muted:#64748b;--dark:#0f172a;--dark2:#1e293b;--border:#1e3a5f;
   --bg-body:#f8fafc;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 body{font-family:'Inter',sans-serif;color:#1e293b;background:var(--bg-body);
   font-size:11pt;line-height:1.75;}
 

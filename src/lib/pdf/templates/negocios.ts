@@ -72,7 +72,7 @@ export function buildNegocios(
   --p:${colorPrimario};--s:${colorSecundario};--a:${colorAcento};--rp:${rgb};
   --text:#0f172a;--muted:#64748b;--bg:#fff;--soft:#f8fafc;--border:#e2e8f0;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);
   font-size:11pt;line-height:1.75;}
 
@@ -142,6 +142,7 @@ body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);
 
 /* Imagen negocios: redondeada, sombra corporativa, barra de acento en la base */
 .section-image{border-radius:8px;overflow:hidden;margin:8px 0 32px;position:relative;
+  border:1px solid var(--border);
   box-shadow:0 4px 20px rgba(0,0,0,.10),0 1px 4px rgba(0,0,0,.06);}
 .section-image img{width:100%;height:auto;display:block;}
 .img-accent-bar{height:4px;background:linear-gradient(90deg,var(--a),var(--p));}

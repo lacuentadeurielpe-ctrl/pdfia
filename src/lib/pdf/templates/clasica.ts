@@ -57,7 +57,7 @@ export function buildClasica(
   --p:${colorPrimario}; --s:${colorSecundario}; --a:${colorAcento}; --rp:${rgb};
   --text:#1a1a2e; --muted:#64748b; --bg:#fff; --soft:#f8fafc; --border:#e2e8f0;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);font-size:11pt;line-height:1.75;}
 
 .cover{width:100%;height:100vh;background:linear-gradient(135deg,var(--p) 0%,var(--s) 100%);
@@ -101,6 +101,7 @@ body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);font-
 
 /* Imagen clásica: redondeada, sombra con color de marca, overlay degradado en la base */
 .section-image{margin:8px 0 40px;border-radius:14px;overflow:hidden;position:relative;
+  border:1px solid rgba(var(--rp),.18);
   box-shadow:0 12px 40px rgba(var(--rp),.18),0 2px 8px rgba(0,0,0,.07);}
 .section-image img{width:100%;height:auto;display:block;}
 .section-image::after{content:'';position:absolute;bottom:0;left:0;right:0;height:35%;

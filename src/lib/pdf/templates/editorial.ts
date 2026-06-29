@@ -83,7 +83,7 @@ export function buildEditorial(
   --p:${colorPrimario};--s:${colorSecundario};--a:${colorAcento};--rp:${rgb};
   --text:#1e1b4b;--muted:#64748b;--bg:#fff;--soft:#fafaf9;--border:#e2e8f0;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 body{font-family:'Source Sans 3',sans-serif;color:var(--text);background:var(--bg);
   font-size:11.5pt;line-height:1.78;}
 
@@ -145,16 +145,17 @@ body{font-family:'Source Sans 3',sans-serif;color:var(--text);background:var(--b
 
 /* Imagen par (even): flota a la derecha, texto la rodea — efecto magazine */
 .img-float-right{float:right;width:44%;margin:0 0 20px 28px;border-radius:10px;overflow:hidden;
+  border:1px solid rgba(0,0,0,.1);
   box-shadow:0 10px 40px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.08);
   shape-outside:border-box;position:relative;z-index:1;}
 .img-float-right img{width:100%;height:auto;display:block;}
 .clearfix::after{content:'';display:table;clear:both;}
 
-/* Imagen impar (odd): full-bleed antes del header, cinematográfica */
-.img-bleed{width:100%;height:260px;overflow:hidden;position:relative;margin-bottom:0;}
-.img-bleed img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
-.img-bleed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:65%;
-  background:linear-gradient(to top,rgba(var(--rp),.55),transparent);}
+/* Imagen impar (odd): full-bleed antes del header, cinematográfica — imagen 16:9 completa, sin recorte */
+.img-bleed{width:100%;overflow:hidden;position:relative;margin-bottom:0;}
+.img-bleed img{width:100%;height:auto;display:block;}
+.img-bleed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:55%;
+  background:linear-gradient(to top,rgba(var(--rp),.45),transparent);pointer-events:none;}
 
 /* CONTENT */
 .section-content{font-size:11.5pt;line-height:1.78;position:relative;z-index:1;}

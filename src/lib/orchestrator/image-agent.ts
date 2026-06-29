@@ -23,18 +23,22 @@ Calidad fotográfica o ilustrativa premium, estilo editorial.`;
 }
 
 // Intenta generar la imagen con UN modelo. Devuelve el base64 o null.
+// aspectRatio (ej. "16:9") fuerza imágenes horizontales nativas — sin recorte posterior.
 async function intentarModelo(
   ai: GoogleGenAI,
   model: string,
   finalPrompt: string,
-  sectionOrder: number
+  sectionOrder: number,
+  aspectRatio?: string
 ): Promise<{ data: string; mime: string } | null> {
   try {
+    const config: Record<string, unknown> = { responseModalities: ["TEXT", "IMAGE"] };
+    if (aspectRatio) config.imageConfig = { aspectRatio };
     const res = await ai.models.generateContent({
       model,
       contents: [{ role: "user", parts: [{ text: finalPrompt }] }],
-      config: { responseModalities: ["TEXT", "IMAGE"] },
-    });
+      config,
+    } as unknown as Parameters<typeof ai.models.generateContent>[0]);
     const parts = res.candidates?.[0]?.content?.parts ?? [];
     for (const part of parts) {
       if (part.inlineData?.data) {
@@ -80,12 +84,23 @@ export async function generateImage(
 
   const ai = new GoogleGenAI({ apiKey });
 
-  // Probar cada modelo de la vía en orden hasta que uno entregue imagen
+  // Probar cada modelo de la vía en orden hasta que uno entregue imagen.
+  // 1ª pasada: pedir 16:9 (imágenes horizontales nativas, sin recorte).
   let imagen: { data: string; mime: string } | null = null;
   for (const model of modelos) {
-    console.log(`[image-agent] Sección ${sectionOrder} — intentando ${model} ("${sectionTitle}")`);
-    imagen = await intentarModelo(ai, model, finalPrompt, sectionOrder);
+    console.log(`[image-agent] Sección ${sectionOrder} — intentando ${model} 16:9 ("${sectionTitle}")`);
+    imagen = await intentarModelo(ai, model, finalPrompt, sectionOrder, "16:9");
     if (imagen) break;
+  }
+
+  // 2ª pasada (fallback): si ningún modelo aceptó el imageConfig, reintentar sin él.
+  // Garantiza que la generación nunca se rompa por un parámetro no soportado.
+  if (!imagen) {
+    console.warn(`[image-agent] Sección ${sectionOrder} — reintentando sin aspect ratio`);
+    for (const model of modelos) {
+      imagen = await intentarModelo(ai, model, finalPrompt, sectionOrder);
+      if (imagen) break;
+    }
   }
 
   if (!imagen) {
