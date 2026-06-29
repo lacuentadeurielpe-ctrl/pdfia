@@ -1,6 +1,7 @@
 import type { Outline, Section } from "@/lib/orchestrator/parser";
 import type { BrandConfig, RenderOptions } from "./types";
 import { hexToRgb, mdToHtml, shouldShowImage } from "./shared";
+import { imageLayout } from "./image-format";
 
 export function buildNegocios(
   outline: Outline,
@@ -24,8 +25,9 @@ export function buildNegocios(
   const sectionsHtml = sections.map((s, i) => {
     const content = mdToHtml(s.content);
     const showImg = shouldShowImage(opts.modoImagenes, i, s.imageUrl);
+    const { layout } = imageLayout("negocios", i);
     const imgBlock = showImg
-      ? `<div class="section-image">
+      ? `<div class="section-image ${layout}">
           <img src="${s.imageUrl}" alt="${s.title}" loading="eager" />
           <div class="img-accent-bar"></div>
          </div>`
@@ -144,6 +146,8 @@ body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);
 .section-image{border-radius:8px;overflow:hidden;margin:8px 0 32px;position:relative;
   border:1px solid var(--border);
   box-shadow:0 4px 20px rgba(0,0,0,.10),0 1px 4px rgba(0,0,0,.06);}
+/* Ritmo: 'full' a todo el ancho (16:9), 'inset' más pequeña centrada (4:3) */
+.section-image.inset{width:68%;margin-left:auto;margin-right:auto;}
 .section-image img{width:100%;height:auto;display:block;}
 .img-accent-bar{height:4px;background:linear-gradient(90deg,var(--a),var(--p));}
 

@@ -1,26 +1,36 @@
 import type { TemplateName } from "./types";
 
+export type ImgLayout = "full" | "inset" | "wide" | "bleed" | "float";
+
 /**
- * Proporción NATIVA de imagen por plantilla — la que se le pide a Gemini.
- * Como la imagen se genera ya en esta forma, no hay recorte posterior.
- * Cada plantilla tiene su propio carácter visual.
+ * Cómo se integra la imagen de cada capítulo. Devuelve el layout (clase CSS)
+ * + la proporción nativa que se le pide a Gemini (la imagen se genera ya en
+ * esa forma, sin recorte posterior).
  *
- * Editorial alterna según la posición del capítulo (índice 0-based):
- *   - par   → 4:5 vertical (flota junto al texto, estilo revista)
- *   - impar → 16:9 horizontal (a sangre, cinematográfica)
+ * Plantillas PREMIUM (editorial, técnico, negocios): alternan por posición
+ * para dar RITMO dentro de un mismo documento (no todas iguales).
+ * Plantillas base (clásica, minimalista): forma única y consistente.
  *
  * Ratios soportados por gemini-2.5-flash-image: 21:9, 16:9, 4:3, 3:2,
  * 1:1, 9:16, 3:4, 2:3, 5:4, 4:5.
  */
-export function imageAspectRatio(plantilla: TemplateName, index: number): string {
+export function imageLayout(plantilla: TemplateName, index: number): { layout: ImgLayout; aspectRatio: string } {
+  const par = index % 2 === 0;
   switch (plantilla) {
-    case "clasica":     return "3:2";
-    case "minimalista": return "4:3";
-    case "editorial":   return index % 2 === 0 ? "4:5" : "16:9";
-    case "tecnico":     return "16:9";
-    case "negocios":    return "16:9";
-    default:            return "16:9";
+    // ── Base: una sola forma por plantilla ──
+    case "clasica":     return { layout: "full",  aspectRatio: "3:2" };
+    case "minimalista": return { layout: "inset", aspectRatio: "4:3" };
+    // ── Premium: alternan para crear ritmo ──
+    case "editorial":   return par ? { layout: "float", aspectRatio: "4:5"  } : { layout: "bleed", aspectRatio: "16:9" };
+    case "tecnico":     return par ? { layout: "full",  aspectRatio: "16:9" } : { layout: "inset", aspectRatio: "4:3"  };
+    case "negocios":    return par ? { layout: "full",  aspectRatio: "16:9" } : { layout: "inset", aspectRatio: "4:3"  };
+    default:            return { layout: "full", aspectRatio: "16:9" };
   }
+}
+
+/** Proporción nativa a pedirle a Gemini para el capítulo (usado al generar). */
+export function imageAspectRatio(plantilla: TemplateName, index: number): string {
+  return imageLayout(plantilla, index).aspectRatio;
 }
 
 /** true si la proporción es más alta que ancha (orientación vertical). */

@@ -1,6 +1,7 @@
 import type { Outline, Section } from "@/lib/orchestrator/parser";
 import type { BrandConfig, RenderOptions } from "./types";
 import { hexToRgb, mdToHtml, shouldShowImage } from "./shared";
+import { imageLayout } from "./image-format";
 
 export function buildTecnico(
   outline: Outline,
@@ -25,8 +26,9 @@ export function buildTecnico(
   const sectionsHtml = sections.map((s, i) => {
     const content = mdToHtml(s.content);
     const showImg = shouldShowImage(opts.modoImagenes, i, s.imageUrl);
+    const { layout } = imageLayout("tecnico", i);
     const imgBlock = showImg
-      ? `<div class="section-image">
+      ? `<div class="section-image ${layout}">
           <div class="img-top-bar"></div>
           <div class="img-label">// FIGURA ${String(i + 1).padStart(2, "0")}</div>
           <img src="${s.imageUrl}" alt="${s.title}" loading="eager" />
@@ -136,6 +138,8 @@ body{font-family:'Inter',sans-serif;color:#1e293b;background:var(--bg-body);
 /* Imagen técnico: borde oscuro, barra gradiente arriba, label monoespacio, desaturada */
 .section-image{border:1px solid var(--border);border-radius:6px;overflow:hidden;
   margin:24px 0 32px;position:relative;}
+/* Ritmo: 'full' a todo el ancho (16:9), 'inset' más pequeña centrada (4:3) */
+.section-image.inset{width:62%;margin-left:auto;margin-right:auto;}
 .img-top-bar{height:3px;background:linear-gradient(90deg,var(--a),var(--p));}
 .img-label{background:var(--dark);color:var(--a);
   font-family:'JetBrains Mono',monospace;font-size:7pt;padding:5px 12px;letter-spacing:1px;}
