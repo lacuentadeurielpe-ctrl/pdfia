@@ -22,6 +22,28 @@
   html { scroll-behavior: smooth; }
 }
 
+/* ── Animaciones modal de plantillas ── */
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+@keyframes overlayOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes modalOut {
+  from { opacity: 1; transform: scale(1)    translateY(0);    }
+  to   { opacity: 0; transform: scale(0.94) translateY(12px); }
+}
+.modal-overlay        { animation: overlayIn 0.22s ease both; }
+.modal-overlay.hiding { animation: overlayOut 0.18s ease both; }
+.modal-panel         { animation: modalIn  0.28s cubic-bezier(0.16,1,0.3,1) both; }
+.modal-panel.hiding  { animation: modalOut 0.18s ease both; }
+
 /* Prosa de páginas legales */
 .legal-content h2 { @apply text-xl font-bold text-white mt-10 mb-3; }
 .legal-content h3 { @apply text-base font-semibold text-white mt-6 mb-2; }

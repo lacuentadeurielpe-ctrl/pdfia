@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Image, BookOpen, Mic2, Zap, Star, Crown, Lock, AlertTriangle, Palette, Eye, Check } from "lucide-react";
+import { Sparkles, Image, BookOpen, Mic2, Zap, Star, Crown, Lock, AlertTriangle, Palette, Check } from "lucide-react";
 import Link from "next/link";
 import type { TemplateName, ModoImagenes } from "@/lib/pdf/templates/index";
 import TemplatePreviewModal from "./TemplatePreviewModal";
@@ -333,13 +333,13 @@ export default function CrearPDFForm() {
               <div key={t.id} className="flex flex-col group">
                 {/* Card thumbnail */}
                 <div
-                  className={`relative rounded-xl overflow-hidden cursor-pointer transition-all ring-2 ${
+                  className={`relative rounded-xl overflow-hidden cursor-pointer transition-all duration-200 ring-2 ${
                     sel
                       ? "ring-indigo-500 shadow-lg shadow-indigo-500/25"
-                      : "ring-gray-700 hover:ring-gray-500"
+                      : "ring-gray-700 hover:ring-indigo-400/60 hover:shadow-md hover:shadow-indigo-500/10"
                   }`}
                   style={{ aspectRatio: "210 / 297" }}
-                  onClick={() => setPlantilla(t.id)}
+                  onClick={() => setPreviewTemplate(t.id)}
                 >
                   <TemplateCoverThumbnail template={t.id} />
                   {/* Checkmark cuando está seleccionada */}
@@ -348,16 +348,8 @@ export default function CrearPDFForm() {
                       <Check className="w-3 h-3 text-white" />
                     </div>
                   )}
-                  {/* Botón de detalle — aparece al hover */}
-                  <button
-                    type="button"
-                    aria-label="Ver detalle"
-                    onClick={(e) => { e.stopPropagation(); setPreviewTemplate(t.id); }}
-                    className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-black/80 text-white rounded-md px-2 py-1 flex items-center gap-1 text-xs"
-                  >
-                    <Eye className="w-3 h-3" />
-                    <span>Detalle</span>
-                  </button>
+                  {/* Overlay sutil al hover */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 pointer-events-none" />
                 </div>
                 {/* Nombre + tag */}
                 <div className="mt-1.5 px-0.5 flex items-center justify-between">
