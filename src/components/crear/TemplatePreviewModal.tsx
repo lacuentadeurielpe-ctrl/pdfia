@@ -327,6 +327,114 @@ function ContentManuscrito() {
   );
 }
 
+/* ─── Back Matter (página final) ────────────────────────────── */
+
+function BackClasica() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#f8fafc", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"16px", position:"relative" }}>
+      <div style={{ width:34, height:34, borderRadius:8, background:`linear-gradient(135deg,${P},${S})`, marginBottom:10 }} />
+      <div style={{ color:"#1a1a2e", fontSize:11, fontWeight:800, fontFamily:"Georgia,serif", marginBottom:4 }}>FoxPDF</div>
+      <div style={{ width:24, height:2, background:A, borderRadius:1, marginBottom:8 }} />
+      <div style={{ color:"#64748b", fontSize:6, textAlign:"center", marginBottom:6 }}>foxpdf.cloud</div>
+      <div style={{ color:"#94a3b8", fontSize:5.5, textAlign:"center", lineHeight:1.6 }}>Información generada con IA<br/>para uso educativo y comercial</div>
+      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:3, background:`linear-gradient(90deg,${A},${P},${S})` }} />
+    </div>
+  );
+}
+
+function BackMinimalista() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#fff", borderLeft:`4px solid ${P}`, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"16px" }}>
+      <div style={{ width:40, height:40, borderRadius:"50%", border:`2px solid ${P}`, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:12 }}>
+        <div style={{ width:18, height:18, borderRadius:"50%", background:`${P}22` }} />
+      </div>
+      <div style={{ color:"#1e293b", fontSize:11, fontWeight:700, fontFamily:"Georgia,serif", marginBottom:6 }}>FoxPDF</div>
+      <div style={{ width:20, height:1, background:P, marginBottom:8 }} />
+      <div style={{ color:"#64748b", fontSize:6, textAlign:"center" }}>foxpdf.cloud</div>
+    </div>
+  );
+}
+
+function BackEditorial() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:`linear-gradient(160deg,${P},${S})`, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"16px", position:"relative" }}>
+      <div style={{ width:36, height:36, borderRadius:8, background:"rgba(255,255,255,.15)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:10 }}>
+        <div style={{ fontSize:14, fontWeight:800, color:"white", fontFamily:"Georgia,serif" }}>F</div>
+      </div>
+      <div style={{ color:"white", fontSize:12, fontWeight:800, fontFamily:"Georgia,serif", marginBottom:4 }}>FoxPDF</div>
+      <div style={{ width:24, height:2, background:A, marginBottom:8 }} />
+      <div style={{ color:"rgba(255,255,255,.65)", fontSize:6, textAlign:"center" }}>foxpdf.cloud</div>
+      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:3, background:`linear-gradient(90deg,${A},${S},${P})` }} />
+    </div>
+  );
+}
+
+function BackTecnico() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#0f172a", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"16px" }}>
+      <div style={{ color:P, fontSize:5.5, fontFamily:"monospace", letterSpacing:2, marginBottom:12 }}>// FIN DE DOCUMENTO</div>
+      <div style={{ width:28, height:28, borderRadius:4, background:"rgba(255,255,255,.08)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:8 }}>
+        <div style={{ color:"#f1f5f9", fontSize:10, fontFamily:"monospace", fontWeight:700 }}>F</div>
+      </div>
+      <div style={{ color:"#f1f5f9", fontSize:9, fontFamily:"monospace", fontWeight:700, marginBottom:4 }}>FoxPDF</div>
+      <div style={{ color:P, fontSize:5.5, fontFamily:"monospace" }}>foxpdf.cloud</div>
+    </div>
+  );
+}
+
+function BackNegocios() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#0f172a", display:"flex", flexDirection:"column" }}>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"16px" }}>
+        <div style={{ width:36, height:36, borderRadius:8, background:"rgba(255,255,255,.08)", marginBottom:10 }} />
+        <div style={{ color:"#f1f5f9", fontSize:12, fontWeight:900, fontFamily:"sans-serif", marginBottom:4 }}>FoxPDF</div>
+        <div style={{ width:24, height:2, background:A, marginBottom:8 }} />
+        <div style={{ color:A, fontSize:6 }}>foxpdf.cloud</div>
+      </div>
+      <div style={{ height:4, background:`linear-gradient(90deg,${A},${P},${S})` }} />
+    </div>
+  );
+}
+
+function BackRevista() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#f4f1ea", display:"flex", flexDirection:"column" }}>
+      <div style={{ height:32, background:P }} />
+      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"14px" }}>
+        <div style={{ fontSize:16, fontWeight:900, color:"#111", textTransform:"uppercase", letterSpacing:2, marginBottom:6 }}>FoxPDF</div>
+        <div style={{ height:2, width:40, background:"#111", marginBottom:8 }} />
+        <div style={{ fontSize:6, color:"#555", letterSpacing:1 }}>foxpdf.cloud</div>
+      </div>
+    </div>
+  );
+}
+
+function BackLujo() {
+  const gold = "#b8924f";
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#f7f4ee", display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div style={{ border:`1px solid ${gold}`, padding:"24px 28px", textAlign:"center", margin:"10px" }}>
+        <div style={{ fontSize:12, color:gold, marginBottom:12 }}>❦</div>
+        <div style={{ fontFamily:"Georgia,serif", fontSize:12, fontWeight:500, color:"#1a1a1a", letterSpacing:1, marginBottom:6 }}>FoxPDF</div>
+        <div style={{ width:20, height:1, background:gold, margin:"0 auto 8px" }} />
+        <div style={{ fontFamily:"Georgia,serif", fontStyle:"italic", fontSize:6.5, color:"#7a6a4a" }}>foxpdf.cloud</div>
+      </div>
+    </div>
+  );
+}
+
+function BackManuscrito() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#faf6ec", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"16px", fontFamily:"Georgia,serif" }}>
+      <div style={{ fontSize:10, color:"#8a7a55", letterSpacing:6, marginBottom:14 }}>❦ ❦ ❦</div>
+      <div style={{ fontSize:12, fontWeight:500, color:"#2a2419", marginBottom:6 }}>FoxPDF</div>
+      <div style={{ width:24, height:1, background:"#d8d0bd", margin:"0 auto 8px" }} />
+      <div style={{ fontStyle:"italic", fontSize:6.5, color:"#6a5d45" }}>foxpdf.cloud</div>
+      <div style={{ fontSize:8, color:"#9a8a6a", letterSpacing:4, marginTop:16 }}>· · ·</div>
+    </div>
+  );
+}
+
 const COVER_MAP: Record<TemplateName, () => React.ReactElement> = {
   clasica:     CoverClasica,
   minimalista: CoverMinimalista,
@@ -349,6 +457,17 @@ const CONTENT_MAP: Record<TemplateName, () => React.ReactElement> = {
   manuscrito:  ContentManuscrito,
 };
 
+const BACK_MAP: Record<TemplateName, () => React.ReactElement> = {
+  clasica:     BackClasica,
+  minimalista: BackMinimalista,
+  editorial:   BackEditorial,
+  tecnico:     BackTecnico,
+  negocios:    BackNegocios,
+  revista:     BackRevista,
+  lujo:        BackLujo,
+  manuscrito:  BackManuscrito,
+};
+
 /* ─── Modal ──────────────────────────────────────────────────── */
 
 interface Props {
@@ -358,8 +477,17 @@ interface Props {
   selected: TemplateName;
 }
 
-const PAGE_W = 180;
+const PAGE_W = 130;
 const PAGE_H = Math.round(PAGE_W * 1.414);
+
+const PAGE_STYLE: React.CSSProperties = {
+  width: PAGE_W,
+  height: PAGE_H,
+  borderRadius: 4,
+  overflow: "hidden",
+  boxShadow: "0 6px 24px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.08)",
+  flexShrink: 0,
+};
 
 export default function TemplatePreviewModal({ template, onClose, onSelect, selected }: Props) {
   const idx = TEMPLATES_ORDER.indexOf(template);
@@ -368,6 +496,7 @@ export default function TemplatePreviewModal({ template, onClose, onSelect, sele
   const meta = TEMPLATE_META[template];
   const Cover   = COVER_MAP[template];
   const Content = CONTENT_MAP[template];
+  const Back    = BACK_MAP[template];
   const isSelected = selected === template;
 
   return (
@@ -377,7 +506,7 @@ export default function TemplatePreviewModal({ template, onClose, onSelect, sele
       onClick={onClose}
     >
       <div
-        className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl"
+        className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -394,8 +523,8 @@ export default function TemplatePreviewModal({ template, onClose, onSelect, sele
           </button>
         </div>
 
-        {/* Pages preview */}
-        <div className="flex items-center justify-center gap-8 px-6 py-6">
+        {/* Pages preview — 3 páginas */}
+        <div className="flex items-center justify-center gap-6 px-6 py-6">
           {/* Nav prev */}
           <button
             onClick={() => prev && onSelect(prev)}
@@ -410,15 +539,22 @@ export default function TemplatePreviewModal({ template, onClose, onSelect, sele
             {/* Portada */}
             <div>
               <p className="text-xs text-gray-500 text-center mb-2">Portada</p>
-              <div style={{ width: PAGE_W, height: PAGE_H, borderRadius: 6, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.08)" }}>
+              <div style={PAGE_STYLE}>
                 <Cover />
               </div>
             </div>
             {/* Contenido */}
             <div>
               <p className="text-xs text-gray-500 text-center mb-2">Contenido</p>
-              <div style={{ width: PAGE_W, height: PAGE_H, borderRadius: 6, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.08)" }}>
+              <div style={PAGE_STYLE}>
                 <Content />
+              </div>
+            </div>
+            {/* Final */}
+            <div>
+              <p className="text-xs text-gray-500 text-center mb-2">Final</p>
+              <div style={PAGE_STYLE}>
+                <Back />
               </div>
             </div>
           </div>
