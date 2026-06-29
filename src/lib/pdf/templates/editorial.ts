@@ -56,7 +56,7 @@ export function buildEditorial(
         <h2 class="section-title">${s.title}</h2>
         ${s.subtitle ? `<p class="section-subtitle">${s.subtitle}</p>` : ""}
         ${imgFloatRight}
-        <div class="section-content"><p>${content}</p></div>
+        <div class="section-content">${content}</div>
         <div class="clearfix"></div>
         ${opts.marcaDeAgua ? `<div class="wm-footer">Creado con FoxPDF · foxpdf.cloud</div>` : ""}
       </div>

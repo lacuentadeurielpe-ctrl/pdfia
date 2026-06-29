@@ -33,7 +33,7 @@ export function buildClasica(
         ${s.subtitle ? `<p class="section-subtitle">${s.subtitle}</p>` : ""}
       </div>
       ${imgBlock}
-      <div class="section-content"><p>${content}</p></div>
+      <div class="section-content">${content}</div>
       ${opts.marcaDeAgua ? `<div class="wm-footer">Creado con FoxPDF · foxpdf.cloud</div>` : ""}
     </div>`;
   }).join("\n");

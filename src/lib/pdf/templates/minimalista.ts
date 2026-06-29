@@ -32,7 +32,7 @@ export function buildMinimalista(
       <div class="title-rule"></div>
       ${s.subtitle ? `<p class="section-subtitle">${s.subtitle}</p>` : ""}
       ${imgBlock}
-      <div class="section-content drop-cap"><p>${content}</p></div>
+      <div class="section-content drop-cap">${content}</div>
       ${opts.marcaDeAgua ? `<div class="wm-footer">Creado con FoxPDF · foxpdf.cloud</div>` : ""}
     </div>`;
   }).join("\n");
