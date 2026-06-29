@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Image, BookOpen, Mic2, Zap, Star, Crown, Lock, AlertTriangle, Palette } from "lucide-react";
+import { Sparkles, Image, BookOpen, Mic2, Zap, Star, Crown, Lock, AlertTriangle, Palette, Eye } from "lucide-react";
 import Link from "next/link";
 import type { TemplateName, ModoImagenes } from "@/lib/pdf/templates/index";
+import TemplatePreviewModal from "./TemplatePreviewModal";
 
 const CALIDADES = [
   {
@@ -76,6 +77,7 @@ export default function CrearPDFForm() {
   const [incluirImagenes, setIncluirImagenes] = useState(true);
   const [plantilla, setPlantilla]             = useState<TemplateName>("clasica");
   const [modoImagenes, setModoImagenes]       = useState<ModoImagenes>("todas");
+  const [previewTemplate, setPreviewTemplate] = useState<TemplateName | null>(null);
   const [loading, setLoading]               = useState(false);
   const [error, setError]                   = useState("");
   const [planInfo, setPlanInfo]             = useState<PlanInfo | null>(null);
@@ -318,26 +320,38 @@ export default function CrearPDFForm() {
         </p>
         <div className="grid grid-cols-1 gap-2">
           {TEMPLATES.map((t) => (
-            <button
+            <div
               key={t.id}
-              type="button"
-              onClick={() => setPlantilla(t.id)}
-              className={`text-left px-4 py-3 rounded-xl border transition-colors flex items-center justify-between ${
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border transition-colors ${
                 plantilla === t.id
                   ? "border-indigo-500 bg-indigo-600/10"
-                  : "border-gray-700 hover:border-gray-600 bg-gray-800"
+                  : "border-gray-700 bg-gray-800"
               }`}
             >
-              <div>
-                <span className={`text-sm font-semibold ${plantilla === t.id ? "text-indigo-300" : "text-white"}`}>
-                  {t.label}
-                </span>
-                <span className="text-gray-500 text-xs ml-2">· {t.desc}</span>
-              </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ml-3 ${
-                t.tag === "Premium" ? "bg-amber-600/20 text-amber-300" : "bg-gray-700 text-gray-400"
-              }`}>{t.tag}</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => setPlantilla(t.id)}
+                className="flex-1 text-left flex items-center justify-between min-w-0"
+              >
+                <div className="min-w-0">
+                  <span className={`text-sm font-semibold ${plantilla === t.id ? "text-indigo-300" : "text-white"}`}>
+                    {t.label}
+                  </span>
+                  <span className="text-gray-500 text-xs ml-2 hidden sm:inline">· {t.desc}</span>
+                </div>
+                <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ml-3 ${
+                  t.tag === "Premium" ? "bg-amber-600/20 text-amber-300" : "bg-gray-700 text-gray-400"
+                }`}>{t.tag}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewTemplate(t.id)}
+                className="flex-shrink-0 flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-300 transition-colors px-2 py-1 rounded-lg hover:bg-indigo-600/10 border border-transparent hover:border-indigo-700"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Vista previa</span>
+              </button>
+            </div>
           ))}
         </div>
       </div>
@@ -406,6 +420,15 @@ export default function CrearPDFForm() {
         <Sparkles className="w-5 h-5" />
         {loading ? "Iniciando orquestador..." : sinCreditos ? "Sin créditos disponibles" : "Generar ebook con IA"}
       </button>
+
+      {previewTemplate && (
+        <TemplatePreviewModal
+          template={previewTemplate}
+          selected={plantilla}
+          onSelect={(t) => { setPlantilla(t); setPreviewTemplate(t); }}
+          onClose={() => setPreviewTemplate(null)}
+        />
+      )}
     </form>
   );
 }
