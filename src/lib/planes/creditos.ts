@@ -68,6 +68,27 @@ export async function getOrCreateSuscripcion(userId: string): Promise<EstadoCred
     }
   }
 
+  // Fallback defensivo: si la DB aún no devolvió nada (race condition en primer acceso),
+  // devolvemos el plan gratis en memoria para no crashear el dashboard.
+  if (!sus) {
+    const gratis = getPlan("gratis");
+    const ahora = new Date();
+    const fin = new Date(ahora.getTime() + 30 * 24 * 60 * 60 * 1000);
+    console.warn("[creditos] suscripcion null para userId:", userId, "— usando fallback gratis");
+    return {
+      suscripcion: {
+        user_id:          userId,
+        plan:             "gratis" as PlanId,
+        creditos_totales: gratis.creditos,
+        creditos_usados:  0,
+        ciclo_inicio:     ahora.toISOString(),
+        ciclo_fin:        fin.toISOString(),
+      },
+      plan:         gratis,
+      disponibles:  DEV_UNLOCK_ALL ? 9999 : gratis.creditos,
+    };
+  }
+
   let suscripcion = sus as Suscripcion;
 
   // 3. Renovar ciclo si venció (reset perezoso)
