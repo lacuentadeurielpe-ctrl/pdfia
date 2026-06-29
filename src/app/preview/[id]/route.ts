@@ -42,15 +42,27 @@ export async function GET(
 
   const html = await blob.text();
 
+  // Solo en PANTALLA: simular una hoja A4 (centrada, con fondo de visor).
+  // El @page A4 solo aplica al imprimir; sin esto el preview se estira a todo
+  // el ancho del navegador y la maquetación (imágenes, columnas) se ve distorsionada.
+  // En @media print no aplica nada de esto → el PDF sale A4 completo e intacto.
+  const screenCss = `<style>
+@media screen {
+  html { background:#525659; }
+  body { max-width:794px; margin:24px auto; box-shadow:0 6px 32px rgba(0,0,0,.45); }
+}
+</style>`;
+  let finalHtml = html.replace("</head>", `${screenCss}</head>`);
+
   // Inyectar auto-print si viene con ?print=1
   const url = new URL(req.url);
   const shouldPrint = url.searchParams.get("print") === "1";
-  const finalHtml = shouldPrint
-    ? html.replace(
-        "if (typeof window !== 'undefined' && window.location.search.includes('print=1'))",
-        "if (true)"
-      )
-    : html;
+  if (shouldPrint) {
+    finalHtml = finalHtml.replace(
+      "if (typeof window !== 'undefined' && window.location.search.includes('print=1'))",
+      "if (true)"
+    );
+  }
 
   return new Response(finalHtml, {
     headers: {
