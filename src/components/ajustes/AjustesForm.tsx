@@ -11,6 +11,8 @@ interface Config {
   color_primario: string;
   color_secundario: string;
   color_acento: string;
+  url_negocio: string | null;
+  footer_texto: string | null;
 }
 
 interface Props {
@@ -35,6 +37,8 @@ export default function AjustesForm({ config, userId, marcaPersonalizada, planNo
   const [primario, setPrimario]     = useState(config?.color_primario ?? "#6366f1");
   const [secundario, setSecundario] = useState(config?.color_secundario ?? "#8b5cf6");
   const [acento, setAcento]         = useState(config?.color_acento ?? "#06b6d4");
+  const [urlNegocio, setUrlNegocio] = useState(config?.url_negocio ?? "");
+  const [footerTexto, setFooterTexto] = useState(config?.footer_texto ?? "");
   const [saving, setSaving]         = useState(false);
   const [saved, setSaved]           = useState(false);
   const [uploading, setUploading]   = useState(false);
@@ -66,6 +70,8 @@ export default function AjustesForm({ config, userId, marcaPersonalizada, planNo
       color_primario:   primario,
       color_secundario: secundario,
       color_acento:     acento,
+      url_negocio:      urlNegocio,
+      footer_texto:     footerTexto,
     }, { onConflict: "user_id" });
     setSaving(false);
     setSaved(true);
@@ -100,20 +106,49 @@ export default function AjustesForm({ config, userId, marcaPersonalizada, planNo
         </div>
       )}
 
-      {/* Nombre del negocio */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <h2 className="text-white font-semibold mb-4">Información básica</h2>
-        <label className="block text-sm text-gray-400 mb-1.5">Nombre del negocio</label>
-        <input
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white
-                     focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"
-          placeholder="Ej: Marketing Pro Studio"
-        />
-        <p className="text-gray-600 text-xs mt-2">
-          Aparece en la portada y en el eyebrow de cada capítulo del PDF.
-        </p>
+      {/* Información básica */}
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5">
+        <h2 className="text-white font-semibold">Información básica</h2>
+        <div>
+          <label className="block text-sm text-gray-400 mb-1.5">Nombre del negocio</label>
+          <input
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white
+                       focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"
+            placeholder="Ej: Marketing Pro Studio"
+          />
+          <p className="text-gray-600 text-xs mt-2">
+            Aparece en la portada y eyebrow de cada capítulo.
+          </p>
+        </div>
+        <div>
+          <label className="block text-sm text-gray-400 mb-1.5">URL del sitio web</label>
+          <input
+            value={urlNegocio}
+            onChange={(e) => setUrlNegocio(e.target.value)}
+            type="url"
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white
+                       focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"
+            placeholder="Ej: https://mipagina.com"
+          />
+          <p className="text-gray-600 text-xs mt-2">
+            Se muestra en la contraportada del PDF.
+          </p>
+        </div>
+        <div>
+          <label className="block text-sm text-gray-400 mb-1.5">Pie de página</label>
+          <textarea
+            value={footerTexto}
+            onChange={(e) => setFooterTexto(e.target.value)}
+            rows={3}
+            maxLength={300}
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white
+                       focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm resize-none"
+            placeholder="Ej: Todos los derechos reservados. Este documento es confidencial."
+          />
+          <p className="text-gray-600 text-xs mt-1">{footerTexto.length}/300 · Aparece en la contraportada.</p>
+        </div>
       </div>
 
       {/* Logo */}

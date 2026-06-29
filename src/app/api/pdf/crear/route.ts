@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const body = await req.json();
-  const { titulo, contexto, calidad, capitulos, tono, incluirImagenes } = body;
+  const { titulo, contexto, calidad, capitulos, tono, incluirImagenes, plantilla, modoImagenes } = body;
 
   if (!contexto?.trim()) {
     return NextResponse.json({ error: "El contexto es requerido" }, { status: 400 });
@@ -68,6 +68,8 @@ export async function POST(req: NextRequest) {
       num_capitulos:    capFinal,
       tono:             tono ?? "profesional",
       estado:           "pendiente",
+      plantilla:        plantilla ?? "clasica",
+      modo_imagenes:    modoImagenes ?? (conImagenes ? "todas" : "ninguna"),
     })
     .select("id")
     .single();

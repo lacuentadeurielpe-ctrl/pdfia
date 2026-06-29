@@ -108,7 +108,28 @@ export const PLANES: Record<PlanId, PlanInterno> = {
   },
 };
 
+// ── DEV UNLOCK ──────────────────────────────────────────────────────
+// Pon a false cuando quieras volver a conectar los planes reales.
+export const DEV_UNLOCK_ALL = true;
+
+const PLAN_DEV_UNLOCKED: PlanInterno = {
+  id:                  "agencia",
+  nombre:              "Agencia",
+  precioSoles:         0,
+  creditos:            9999,
+  calidades:           ["estandar", "avanzado", "premium"],
+  permiteImagenes:     true,
+  viaImagenPorCalidad: { estandar: "flash", avanzado: "flash", premium: "pro" },
+  capitulosMax:        15,
+  marcaDeAgua:         false,
+  marcaPersonalizada:  true,
+  historialDias:       null,
+  soporte:             "dedicado",
+  externos:            derivarExternos(9999),
+};
+
 export function getPlan(id: string | null | undefined): PlanInterno {
+  if (DEV_UNLOCK_ALL) return PLAN_DEV_UNLOCKED;
   return PLANES[(id ?? "gratis") as PlanId] ?? PLANES.gratis;
 }
 

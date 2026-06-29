@@ -2,7 +2,8 @@ import { getQualityModels, type Calidad } from "./models";
 import { runDirector } from "./director";
 import { writeSection } from "./writer";
 import { generateImage } from "./image-agent";
-import { buildPDFHtml } from "@/lib/pdf/template";
+import { buildPDFHtml } from "@/lib/pdf/templates/index";
+import type { ModoImagenes, TemplateName } from "@/lib/pdf/templates/index";
 import { costoReal } from "@/lib/planes/config";
 import { descontarCreditos } from "@/lib/planes/creditos";
 import type { Outline, Section, BookContext } from "./parser";
@@ -31,6 +32,8 @@ interface Brand {
   colorPrimario: string;
   colorSecundario: string;
   colorAcento: string;
+  urlNegocio?: string;
+  footerTexto?: string;
 }
 
 interface ResumableInput {
@@ -44,6 +47,8 @@ interface ResumableInput {
     outline: string | null;
     paso: string | null;
     titulo: string | null;
+    plantilla: string | null;
+    modo_imagenes: string | null;
   };
   brand: Brand;
   userId: string;
@@ -85,7 +90,9 @@ export async function runResumable(
   const models = getQualityModels(calidad);
   const numChapters = proyecto.num_capitulos ?? 5;
   const tono = proyecto.tono ?? "profesional";
-  const generateImages = proyecto.incluir_imagenes ?? true;
+  const modoImagenes = (proyecto.modo_imagenes ?? "todas") as ModoImagenes;
+  const plantilla = (proyecto.plantilla ?? "clasica") as TemplateName;
+  const generateImages = modoImagenes !== "ninguna";
   const projectId = proyecto.id;
 
   const setPaso = async (paso: string, estado?: string) => {
@@ -218,7 +225,11 @@ export async function runResumable(
   chapters = await loadChapters();
   if (generateImages) {
     const pending = chapters.filter(
-      (c) => c.image_complexity !== "none" && c.image_prompt?.trim() && !c.image_url
+      (c) =>
+        c.image_complexity !== "none" &&
+        c.image_prompt?.trim() &&
+        !c.image_url &&
+        (modoImagenes !== "alternadas" || c.orden % 2 === 0)
     );
 
     if (pending.length > 0) {
@@ -286,7 +297,18 @@ export async function runResumable(
       imageUrl:        c.image_url ?? undefined,
     }));
 
-  const htmlContent = buildPDFHtml(outline, sections, brand, input.marcaDeAgua);
+  const brandFull = {
+    ...brand,
+    urlNegocio:  brand.urlNegocio  ?? "",
+    footerTexto: brand.footerTexto ?? "",
+  };
+  const htmlContent = buildPDFHtml(
+    outline,
+    sections,
+    brandFull,
+    { marcaDeAgua: input.marcaDeAgua, modoImagenes },
+    plantilla
+  );
   const htmlBytes = Buffer.from(htmlContent, "utf-8");
   const fileName = `${projectId}/${Date.now()}.html`;
 

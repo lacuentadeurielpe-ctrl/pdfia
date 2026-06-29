@@ -4,7 +4,7 @@
 // ════════════════════════════════════════════════════════════════════
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPlan, type PlanId, type PlanInterno } from "./config";
+import { getPlan, DEV_UNLOCK_ALL, type PlanId, type PlanInterno } from "./config";
 
 export interface Suscripcion {
   user_id:          string;
@@ -91,7 +91,9 @@ export async function getOrCreateSuscripcion(userId: string): Promise<EstadoCred
   }
 
   const plan = getPlan(suscripcion.plan);
-  const disponibles = Math.max(0, suscripcion.creditos_totales - suscripcion.creditos_usados);
+  const disponibles = DEV_UNLOCK_ALL
+    ? 9999
+    : Math.max(0, suscripcion.creditos_totales - suscripcion.creditos_usados);
 
   return { suscripcion, plan, disponibles };
 }

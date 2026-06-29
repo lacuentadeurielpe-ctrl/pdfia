@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Image, BookOpen, Mic2, Zap, Star, Crown, Lock, AlertTriangle } from "lucide-react";
+import { Sparkles, Image, BookOpen, Mic2, Zap, Star, Crown, Lock, AlertTriangle, Palette } from "lucide-react";
 import Link from "next/link";
+import type { TemplateName, ModoImagenes } from "@/lib/pdf/templates/index";
 
 const CALIDADES = [
   {
@@ -39,6 +40,20 @@ const CALIDADES = [
 
 const TONOS = ["profesional", "educativo", "creativo", "técnico", "divulgativo", "motivacional"];
 
+const TEMPLATES: { id: TemplateName; label: string; desc: string; tag: string }[] = [
+  { id: "clasica",     label: "Clásica",     desc: "Portada degradada, bordes redondeados, sombra de marca",   tag: "Versátil"    },
+  { id: "minimalista", label: "Minimalista", desc: "Blanco puro, borde izquierdo, drop cap, tipografía elegante", tag: "Clean"    },
+  { id: "editorial",  label: "Editorial",   desc: "Fotos flotantes, número decorativo, estilo revista",          tag: "Premium"  },
+  { id: "tecnico",    label: "Técnico",      desc: "Dark navy, sidebar, fuente monoespaciada, estilo doc",       tag: "Premium"  },
+  { id: "negocios",   label: "Negocios",    desc: "Header por página, barra de stats, estilo ejecutivo",         tag: "Premium"  },
+];
+
+const MODOS_IMAGEN: { id: ModoImagenes; label: string; desc: string; creditos: string }[] = [
+  { id: "ninguna",    label: "Sin imágenes",  desc: "Solo texto. Máxima velocidad y ahorro de créditos.",       creditos: "0 extra"                    },
+  { id: "alternadas", label: "Alternadas",    desc: "Una imagen cada dos capítulos. Balance calidad/costo.",    creditos: "~50% menos"                 },
+  { id: "todas",      label: "Todas",         desc: "Una imagen por capítulo. La experiencia más visual.",      creditos: "+1 por capítulo"            },
+];
+
 interface PlanInfo {
   id:             string;
   nombre:         string;
@@ -59,6 +74,8 @@ export default function CrearPDFForm() {
   const [capitulos, setCapitulos]           = useState(5);
   const [tono, setTono]                     = useState("profesional");
   const [incluirImagenes, setIncluirImagenes] = useState(true);
+  const [plantilla, setPlantilla]             = useState<TemplateName>("clasica");
+  const [modoImagenes, setModoImagenes]       = useState<ModoImagenes>("todas");
   const [loading, setLoading]               = useState(false);
   const [error, setError]                   = useState("");
   const [planInfo, setPlanInfo]             = useState<PlanInfo | null>(null);
@@ -81,7 +98,7 @@ export default function CrearPDFForm() {
           });
           // Ajustar si los valores actuales superan el plan
           if (!data.plan.calidades.includes(calidad)) setCalidad("estandar");
-          if (!data.plan.permiteImagenes) setIncluirImagenes(false);
+          if (!data.plan.permiteImagenes) { setIncluirImagenes(false); setModoImagenes("ninguna"); }
         }
       })
       .catch(() => {});
@@ -100,7 +117,12 @@ export default function CrearPDFForm() {
       const res = await fetch("/api/pdf/crear", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titulo, contexto, calidad, capitulos: capActual, tono, incluirImagenes }),
+        body: JSON.stringify({
+          titulo, contexto, calidad, capitulos: capActual, tono,
+          incluirImagenes: modoImagenes !== "ninguna",
+          plantilla,
+          modoImagenes,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al iniciar la generación");
@@ -112,7 +134,8 @@ export default function CrearPDFForm() {
   }
 
   // Créditos disponibles y costo estimado
-  const costoEstimadoActual = 1 + (incluirImagenes && planInfo?.permiteImagenes ? capActual : 0);
+  const imgsEstimadas = modoImagenes === "ninguna" ? 0 : modoImagenes === "alternadas" ? Math.ceil(capActual / 2) : capActual;
+  const costoEstimadoActual = 1 + (planInfo?.permiteImagenes ? imgsEstimadas : 0);
   const creditosDisp  = planInfo?.creditos.disponibles ?? null;
   const sinCreditos   = creditosDisp !== null && creditosDisp < costoEstimadoActual;
 
@@ -284,50 +307,82 @@ export default function CrearPDFForm() {
         </div>
       </div>
 
-      {/* Imágenes IA */}
+      {/* Plantilla */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-              planInfo && !planInfo.permiteImagenes ? "bg-gray-800" : "bg-pink-600/20"
-            }`}>
-              <Image
-                className={`w-4 h-4 ${planInfo && !planInfo.permiteImagenes ? "text-gray-600" : "text-pink-400"}`}
-                aria-label="Imágenes IA"
-              />
-            </div>
-            <div>
-              <p className={`font-semibold text-sm ${planInfo && !planInfo.permiteImagenes ? "text-gray-500" : "text-white"}`}>
-                Imágenes generadas por IA
-              </p>
-              {planInfo && !planInfo.permiteImagenes ? (
-                <p className="text-gray-600 text-xs">
-                  No disponible en tu plan ·{" "}
-                  <Link href="/planes" className="text-indigo-400 hover:text-indigo-300">Mejorar →</Link>
-                </p>
-              ) : (
-                <p className="text-gray-500 text-xs">
-                  Gemini generará una imagen por capítulo · +1 crédito/imagen
-                </p>
-              )}
-            </div>
-          </div>
-          {planInfo && !planInfo.permiteImagenes ? (
-            <Lock className="w-5 h-5 text-gray-700" />
-          ) : (
+        <div className="flex items-center gap-2 mb-1">
+          <Palette className="w-4 h-4 text-indigo-400" />
+          <label className="text-white font-semibold">Plantilla visual</label>
+        </div>
+        <p className="text-gray-500 text-xs mb-4">
+          Diseño del PDF. Los colores de tu marca se aplican automáticamente en todas.
+        </p>
+        <div className="grid grid-cols-1 gap-2">
+          {TEMPLATES.map((t) => (
             <button
+              key={t.id}
               type="button"
-              onClick={() => setIncluirImagenes(!incluirImagenes)}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
-                incluirImagenes ? "bg-indigo-600" : "bg-gray-700"
+              onClick={() => setPlantilla(t.id)}
+              className={`text-left px-4 py-3 rounded-xl border transition-colors flex items-center justify-between ${
+                plantilla === t.id
+                  ? "border-indigo-500 bg-indigo-600/10"
+                  : "border-gray-700 hover:border-gray-600 bg-gray-800"
               }`}
             >
-              <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                incluirImagenes ? "translate-x-7" : "translate-x-1"
-              }`} />
+              <div>
+                <span className={`text-sm font-semibold ${plantilla === t.id ? "text-indigo-300" : "text-white"}`}>
+                  {t.label}
+                </span>
+                <span className="text-gray-500 text-xs ml-2">· {t.desc}</span>
+              </div>
+              <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ml-3 ${
+                t.tag === "Premium" ? "bg-amber-600/20 text-amber-300" : "bg-gray-700 text-gray-400"
+              }`}>{t.tag}</span>
             </button>
-          )}
+          ))}
         </div>
+      </div>
+
+      {/* Modo de imágenes IA */}
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Image className="w-4 h-4 text-pink-400" aria-label="Imágenes IA" />
+          <label className="text-white font-semibold">Imágenes IA</label>
+        </div>
+        <p className="text-gray-500 text-xs mb-4">
+          Generadas por Gemini. Cada imagen gasta 1 crédito.
+        </p>
+        {planInfo && !planInfo.permiteImagenes ? (
+          <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-xl border border-gray-700">
+            <Lock className="w-4 h-4 text-gray-600 flex-shrink-0" />
+            <p className="text-gray-500 text-sm">
+              No disponible en tu plan ·{" "}
+              <Link href="/planes" className="text-indigo-400 hover:text-indigo-300">Mejorar →</Link>
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-3">
+            {MODOS_IMAGEN.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => { setModoImagenes(m.id); setIncluirImagenes(m.id !== "ninguna"); }}
+                className={`text-left p-3 rounded-xl border transition-colors ${
+                  modoImagenes === m.id
+                    ? "border-pink-500 bg-pink-600/10"
+                    : "border-gray-700 hover:border-gray-600 bg-gray-800"
+                }`}
+              >
+                <p className={`font-semibold text-sm mb-1 ${modoImagenes === m.id ? "text-pink-300" : "text-white"}`}>
+                  {m.label}
+                </p>
+                <p className="text-gray-500 text-xs leading-relaxed">{m.desc}</p>
+                <p className={`text-xs mt-2 font-medium ${modoImagenes === m.id ? "text-pink-400" : "text-gray-600"}`}>
+                  {m.creditos}
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {error && (

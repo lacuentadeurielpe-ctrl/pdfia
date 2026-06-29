@@ -9,7 +9,7 @@ export default async function AjustesPage() {
   const [{ data: config }, { plan }] = await Promise.all([
     supabase
       .from("configuraciones_negocio")
-      .select("id, nombre_negocio, logo_url, color_primario, color_secundario, color_acento")
+      .select("id, nombre_negocio, logo_url, color_primario, color_secundario, color_acento, url_negocio, footer_texto")
       .eq("user_id", user!.id)
       .single(),
     getOrCreateSuscripcion(user!.id),

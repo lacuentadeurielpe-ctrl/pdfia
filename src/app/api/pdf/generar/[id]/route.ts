@@ -68,7 +68,7 @@ export async function GET(
         // Marca de marca/branding
         const { data: config } = await supabase
           .from("configuraciones_negocio")
-          .select("nombre_negocio, logo_url, color_primario, color_secundario, color_acento")
+          .select("nombre_negocio, logo_url, color_primario, color_secundario, color_acento, url_negocio, footer_texto")
           .eq("user_id", user.id)
           .single();
 
@@ -78,6 +78,8 @@ export async function GET(
           colorPrimario:   config?.color_primario ?? "#6366f1",
           colorSecundario: config?.color_secundario ?? "#8b5cf6",
           colorAcento:     config?.color_acento ?? "#06b6d4",
+          urlNegocio:      config?.url_negocio ?? "",
+          footerTexto:     config?.footer_texto ?? "",
         };
 
         // Plan del usuario → decide la marca de agua y si puede usar su propia marca
@@ -87,7 +89,7 @@ export async function GET(
         const DEFAULTS = { colorPrimario: "#6366f1", colorSecundario: "#8b5cf6", colorAcento: "#06b6d4" };
         const brandFinal = plan.marcaPersonalizada
           ? brand
-          : { nombreNegocio: "FoxPDF", logoUrl: null, ...DEFAULTS };
+          : { nombreNegocio: "FoxPDF", logoUrl: null, urlNegocio: "", footerTexto: "", ...DEFAULTS };
 
         const result = await runResumable(
           supabaseAdmin,
