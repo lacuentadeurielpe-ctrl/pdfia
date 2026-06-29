@@ -81,19 +81,19 @@ body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);
   display:flex;flex-direction:column;
   page-break-after:always;position:relative;overflow:hidden;}
 .cover-body{flex:1;padding:80px;display:flex;flex-direction:column;justify-content:center;}
-.cover-tag{font-family:'Montserrat',sans-serif;font-size:7.5pt;color:#475569;
+.cover-tag{font-family:'Montserrat',sans-serif;font-size:7.5pt;color:#94a3b8;
   letter-spacing:4px;text-transform:uppercase;margin-bottom:36px;font-weight:600;}
 .cover-title{font-family:'Montserrat',sans-serif;font-size:36pt;font-weight:900;
   color:#f1f5f9;line-height:1.12;margin-bottom:20px;max-width:660px;}
 .cover-accent-line{width:48px;height:4px;background:var(--a);
   border-radius:2px;margin-bottom:24px;}
-.cover-subtitle{font-size:13.5pt;color:#64748b;line-height:1.6;
+.cover-subtitle{font-size:13.5pt;color:#94a3b8;line-height:1.6;
   max-width:580px;font-weight:400;}
 .cover-brand{display:flex;align-items:center;gap:10px;margin-top:40px;}
 .cover-brand img{width:36px;height:36px;object-fit:contain;border-radius:6px;
   background:rgba(255,255,255,.08);padding:3px;}
 .cover-brand-name{font-family:'Montserrat',sans-serif;font-size:10pt;
-  color:#475569;font-weight:600;}
+  color:#94a3b8;font-weight:600;}
 /* Stats bar en la base de la portada */
 .cover-stats{background:#1e293b;display:flex;justify-content:space-around;
   align-items:center;padding:20px 80px;}
@@ -132,7 +132,7 @@ body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);
   background:rgba(255,255,255,.1);padding:2px;}
 .header-name{font-family:'Montserrat',sans-serif;font-size:9pt;font-weight:700;color:#94a3b8;}
 .header-chapter{font-family:'Montserrat',sans-serif;font-size:8pt;font-weight:600;
-  color:#475569;letter-spacing:1px;}
+  color:#64748b;letter-spacing:1px;}
 .header-accent-top{height:3px;background:linear-gradient(90deg,var(--a),var(--p));flex-shrink:0;}
 
 .section-body{flex:1;padding:48px 72px 64px;}
@@ -208,7 +208,7 @@ body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);
   <div class="cover-stats">
     <div class="stat"><span class="stat-num">${totalSections}</span><span class="stat-label">Capítulos</span></div>
     <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Accionable</span></div>
-    <div class="stat"><span class="stat-num">IA</span><span class="stat-label">Generado</span></div>
+    <div class="stat"><span class="stat-num">${new Date().getFullYear()}</span><span class="stat-label">Edición</span></div>
   </div>
   <div class="cover-accent-strip"></div>
   ${opts.marcaDeAgua ? `<div class="wm-cover">Creado con FoxPDF · foxpdf.cloud</div>` : ""}
