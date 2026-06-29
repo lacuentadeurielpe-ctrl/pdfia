@@ -36,6 +36,11 @@ export function buildTecnico(
       : "";
     return `
     <div class="section page-break">
+      <div class="page-folio">
+        <span class="folio-brand">// ${nombreNegocio}</span>
+        <span class="folio-num">CAP.${String(i + 1).padStart(2, "0")} · PÁG.${String(i + 2).padStart(2, "0")}</span>
+      </div>
+      <div class="section-inner-wrap">
       <div class="sidebar">
         ${sections.map((_, j) => `<div class="sidebar-dot ${j === i ? "active" : ""}"></div>`).join('<div class="sidebar-line"></div>')}
       </div>
@@ -46,6 +51,7 @@ export function buildTecnico(
         ${imgBlock}
         <div class="section-content">${content}</div>
         ${opts.marcaDeAgua ? `<div class="wm-footer">// Creado con FoxPDF · foxpdf.cloud</div>` : ""}
+      </div>
       </div>
     </div>`;
   }).join("\n");
@@ -118,7 +124,14 @@ body{font-family:'Inter',sans-serif;color:#1e293b;background:var(--bg-body);
 
 /* SECTIONS */
 .page-break{page-break-before:always;}
-.section{display:flex;min-height:100vh;}
+.section{min-height:100vh;}
+/* Folio técnico — barra oscura con info del capítulo */
+.page-folio{background:var(--dark);display:flex;justify-content:space-between;
+  align-items:center;padding:8px 56px 8px 20px;
+  font-family:'JetBrains Mono',monospace;font-size:7pt;}
+.folio-brand{color:#334155;letter-spacing:1px;}
+.folio-num{color:var(--a);letter-spacing:1px;}
+.section-inner-wrap{display:flex;}
 
 /* Sidebar navigation */
 .sidebar{width:56px;background:var(--dark);flex-shrink:0;

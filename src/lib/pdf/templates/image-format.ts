@@ -24,6 +24,9 @@ export function imageLayout(plantilla: TemplateName, index: number): { layout: I
     case "editorial":   return par ? { layout: "float", aspectRatio: "4:5"  } : { layout: "bleed", aspectRatio: "16:9" };
     case "tecnico":     return par ? { layout: "full",  aspectRatio: "16:9" } : { layout: "inset", aspectRatio: "4:3"  };
     case "negocios":    return par ? { layout: "full",  aspectRatio: "16:9" } : { layout: "inset", aspectRatio: "4:3"  };
+    case "revista":     return par ? { layout: "float", aspectRatio: "4:5"  } : { layout: "bleed", aspectRatio: "16:9" };
+    case "lujo":        return { layout: "inset", aspectRatio: "4:3" };
+    case "manuscrito":  return { layout: "inset", aspectRatio: "4:3" };
     default:            return { layout: "full", aspectRatio: "16:9" };
   }
 }

@@ -3,14 +3,17 @@ import React from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { TemplateName } from "@/lib/pdf/templates/index";
 
-const TEMPLATES_ORDER: TemplateName[] = ["clasica", "minimalista", "editorial", "tecnico", "negocios"];
+const TEMPLATES_ORDER: TemplateName[] = ["clasica", "minimalista", "editorial", "tecnico", "negocios", "revista", "lujo", "manuscrito"];
 
 const TEMPLATE_META: Record<TemplateName, { label: string; desc: string; tag: string; tagColor: string }> = {
-  clasica:     { label: "Clásica",     desc: "Portada con degradado de marca, imágenes con sombra y bordes redondeados. Versátil para cualquier tema.",         tag: "Versátil", tagColor: "#6366f1" },
-  minimalista: { label: "Minimalista", desc: "Fondo blanco, borde izquierdo de acento, drop cap en primer párrafo. Elegante y limpio.",                          tag: "Clean",    tagColor: "#10b981" },
-  editorial:   { label: "Editorial",   desc: "Portada oscura con monograma, imágenes flotadas estilo revista, número de capítulo decorativo.",                    tag: "Premium",  tagColor: "#f59e0b" },
-  tecnico:     { label: "Técnico",     desc: "Dark navy, sidebar de navegación, fuente monoespaciada. Ideal para documentación, guías y manuales.",              tag: "Premium",  tagColor: "#f59e0b" },
-  negocios:    { label: "Negocios",    desc: "Header corporativo por página, barra de stats en portada, estilo ejecutivo. Para reportes y propuestas formales.", tag: "Premium",  tagColor: "#f59e0b" },
+  clasica:     { label: "Clásica",     desc: "Portada con degradado de marca, imágenes con sombra y bordes redondeados. Versátil para cualquier tema.",               tag: "Versátil", tagColor: "#6366f1" },
+  minimalista: { label: "Minimalista", desc: "Fondo blanco, borde izquierdo de acento, drop cap en primer párrafo. Elegante y limpio.",                                tag: "Clean",    tagColor: "#10b981" },
+  editorial:   { label: "Editorial",   desc: "Folio de página, drop cap, imágenes flotadas estilo revista, número decorativo de capítulo.",                            tag: "Premium",  tagColor: "#f59e0b" },
+  tecnico:     { label: "Técnico",     desc: "Dark navy, sidebar de navegación, fuente monoespaciada. Ideal para documentación, guías y manuales.",                    tag: "Premium",  tagColor: "#f59e0b" },
+  negocios:    { label: "Negocios",    desc: "Header corporativo por página, barra de stats en portada, estilo ejecutivo. Para reportes y propuestas formales.",       tag: "Premium",  tagColor: "#f59e0b" },
+  revista:     { label: "Revista",     desc: "Tipografía condensada Oswald, 2 columnas, bloque de color en portada. Energía de magazine editorial.",                   tag: "Premium",  tagColor: "#e11d48" },
+  lujo:        { label: "Lujo",        desc: "Cormorant Garamond, marco dorado, márgenes amplísimos. Elegancia de publicación de alta gama.",                          tag: "Premium",  tagColor: "#b8924f" },
+  manuscrito:  { label: "Manuscrito",  desc: "EB Garamond, sangría literaria, ornamentos tipográficos, folio clásico. Para libros y ensayos de autor.",                tag: "Premium",  tagColor: "#6a5d45" },
 };
 
 /* ─── Thumbnails CSS ─────────────────────────────────────────── */
@@ -211,12 +214,128 @@ function ContentNegocios() {
   );
 }
 
+function CoverRevista() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#f4f1ea", fontFamily:"sans-serif", display:"flex", flexDirection:"column" }}>
+      <div style={{ height:38, background:P, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 14px" }}>
+        <span style={{ color:"rgba(255,255,255,.8)", fontSize:6, letterSpacing:3, fontWeight:600 }}>NÚM. 07 · 2026</span>
+        <span style={{ color:"rgba(255,255,255,.8)", fontSize:6, letterSpacing:2, fontWeight:600 }}>FOXPDF</span>
+      </div>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center", padding:"14px 18px" }}>
+        <div style={{ fontFamily:"sans-serif", fontSize:22, fontWeight:900, color:"#111", lineHeight:.9, textTransform:"uppercase", letterSpacing:-1, marginBottom:8 }}>Marca<br/>que<br/>vende</div>
+        <div style={{ height:2, background:"#111", marginBottom:8 }} />
+        <div style={{ fontSize:7, color:"#555", fontWeight:300 }}>Estrategia para creadores digitales</div>
+      </div>
+      <div style={{ padding:"8px 14px", borderTop:"1px solid #ccc", display:"flex", justifyContent:"space-between" }}>
+        <span style={{ fontSize:5.5, letterSpacing:2, color:"#555" }}>FOXPDF</span>
+        <span style={{ fontSize:5.5, letterSpacing:1, color:"#999" }}>ESTRATEGIA · DISEÑO</span>
+      </div>
+    </div>
+  );
+}
+
+function ContentRevista() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#fff", fontFamily:"sans-serif", padding:"10px 14px" }}>
+      <div style={{ display:"flex", justifyContent:"space-between", borderBottom:"2px solid #111", paddingBottom:5, marginBottom:10 }}>
+        <span style={{ fontSize:5, letterSpacing:2, color:"#999", textTransform:"uppercase" }}>TÍTULO DEL LIBRO</span>
+        <span style={{ fontSize:7, fontWeight:900, color:P }}>02</span>
+      </div>
+      <div style={{ fontSize:6, letterSpacing:3, color:P, textTransform:"uppercase", marginBottom:4, fontWeight:600 }}>Nº 02</div>
+      <div style={{ fontSize:13, fontWeight:900, textTransform:"uppercase", letterSpacing:-0.5, color:"#111", marginBottom:4, lineHeight:1 }}>El gancho</div>
+      <div style={{ height:2, background:P, marginBottom:6 }} />
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+        <div>
+          <span style={{ float:"left", fontWeight:900, fontSize:22, lineHeight:"16px", color:P, marginRight:2, fontFamily:"sans-serif" }}>L</span>
+          <Lines widths={[100,90,82,100,91,78,100,88,75]} height={2.5} gap={3} />
+        </div>
+        <div><Lines widths={[100,92,85,100,88,76,100,91,80]} height={2.5} gap={3} /></div>
+      </div>
+    </div>
+  );
+}
+
+function CoverLujo() {
+  const gold = "#b8924f";
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#f7f4ee", position:"relative", display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div style={{ position:"absolute", inset:10, border:`1px solid ${gold}` }} />
+      <div style={{ position:"absolute", inset:14, border:"0.5px solid #e9e0ce" }} />
+      <div style={{ textAlign:"center", padding:"0 28px", position:"relative", zIndex:1 }}>
+        <div style={{ fontSize:5.5, letterSpacing:5, color:gold, textTransform:"uppercase", marginBottom:12, fontWeight:500 }}>FOXPDF</div>
+        <div style={{ fontFamily:"Georgia,serif", fontSize:17, color:"#1a1a1a", letterSpacing:2, lineHeight:1.2, marginBottom:8, fontWeight:500 }}>Atelier<br/>Digital</div>
+        <div style={{ width:30, height:1, background:gold, margin:"0 auto 8px" }} />
+        <div style={{ fontFamily:"Georgia,serif", fontStyle:"italic", fontSize:7.5, color:"#7a6a4a" }}>la elegancia del detalle</div>
+      </div>
+      <div style={{ position:"absolute", bottom:24, left:0, right:0, textAlign:"center", fontSize:5.5, letterSpacing:3, color:"#9a8a6a" }}>MMXXVI</div>
+    </div>
+  );
+}
+
+function ContentLujo() {
+  const gold = "#b8924f";
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#fefdfb", fontFamily:"Georgia,serif", display:"flex", flexDirection:"column" }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 18px", borderBottom:"1px solid #c8bc9a", fontSize:6, color:"#7a6a4a", fontStyle:"italic" }}>
+        <span>El Arte del Negocio</span>
+        <span style={{ fontStyle:"normal", letterSpacing:2, color:gold }}>· 04 ·</span>
+        <span>FoxPDF</span>
+      </div>
+      <div style={{ flex:1, padding:"18px 24px" }}>
+        <div style={{ fontSize:5.5, letterSpacing:4, color:gold, textAlign:"center", marginBottom:6, fontStyle:"normal" }}>Capítulo II</div>
+        <div style={{ fontSize:13, fontWeight:500, textAlign:"center", color:"#1a1a1a", letterSpacing:.5, marginBottom:4 }}>La voz propia</div>
+        <div style={{ width:20, height:1, background:gold, margin:"0 auto 14px" }} />
+        <div style={{ width:"65%", margin:"0 auto 12px", height:36, background:"#eee9dc", border:"1px solid #c8bc9a" }} />
+        <div style={{ textAlign:"center", fontStyle:"italic", fontSize:8, color:"#7a6a4a", marginBottom:12, padding:"0 12px" }}>"El lujo vive en los detalles que nadie nota a primera vista."</div>
+        <Lines widths={[100,92,85,100,88,78]} color="#d8d0bd" height={2} gap={4} />
+      </div>
+    </div>
+  );
+}
+
+function CoverManuscrito() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#faf6ec", fontFamily:"Georgia,serif", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"16px 20px" }}>
+      <div style={{ fontSize:9, letterSpacing:4, color:"#8a7a55", marginBottom:20 }}>— ❦ —</div>
+      <div style={{ fontSize:7, letterSpacing:4, color:"#9a8a6a", textTransform:"uppercase", marginBottom:14 }}>FoxPDF presenta</div>
+      <div style={{ fontFamily:"Georgia,serif", fontSize:18, color:"#2a2419", textAlign:"center", lineHeight:1.2, marginBottom:8 }}>Cartas a un<br/>joven autor</div>
+      <div style={{ width:36, height:1, background:"#d8d0bd", margin:"8px auto" }} />
+      <div style={{ fontFamily:"Georgia,serif", fontStyle:"italic", fontSize:8, color:"#6a5d45", textAlign:"center" }}>reflexiones sobre el oficio</div>
+      <div style={{ position:"absolute", bottom:28, fontSize:6.5, letterSpacing:3, color:"#9a8a6a" }}>· · ·</div>
+    </div>
+  );
+}
+
+function ContentManuscrito() {
+  return (
+    <div style={{ width:"100%", height:"100%", background:"#faf6ec", fontFamily:"Georgia,serif", display:"flex", flexDirection:"column" }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 16px", borderBottom:"1px solid #d8d0bd", fontSize:6, color:"#6a5d45", fontStyle:"italic" }}>
+        <span>La voz propia</span>
+        <span style={{ fontStyle:"normal", letterSpacing:2 }}>· 07 ·</span>
+        <span>El Arte de Escribir</span>
+      </div>
+      <div style={{ flex:1, padding:"18px 20px" }}>
+        <div style={{ fontSize:7, letterSpacing:4, color:"#9a8a6a", textTransform:"uppercase", textAlign:"center", marginBottom:6 }}>Capítulo Segundo</div>
+        <div style={{ fontSize:13, fontWeight:500, textAlign:"center", color:"#2a2419", marginBottom:4 }}>La voz propia</div>
+        <div style={{ textAlign:"center", fontSize:9, color:"#8a7a55", marginBottom:14 }}>❧</div>
+        <span style={{ float:"left", fontSize:26, lineHeight:"20px", color:"#2a2419", marginRight:3, marginTop:2 }}>H</span>
+        <Lines widths={[100,92,84,100,90,81,100,88,77,100,91]} color="#d8d0bd" height={2} gap={4} />
+        <div style={{ clear:"both" }} />
+        <div style={{ textAlign:"center", fontSize:8, color:"#6a5d45", marginTop:14, fontStyle:"italic" }}>· 07 ·</div>
+      </div>
+    </div>
+  );
+}
+
 const COVER_MAP: Record<TemplateName, () => React.ReactElement> = {
   clasica:     CoverClasica,
   minimalista: CoverMinimalista,
   editorial:   CoverEditorial,
   tecnico:     CoverTecnico,
   negocios:    CoverNegocios,
+  revista:     CoverRevista,
+  lujo:        CoverLujo,
+  manuscrito:  CoverManuscrito,
 };
 
 const CONTENT_MAP: Record<TemplateName, () => React.ReactElement> = {
@@ -225,6 +344,9 @@ const CONTENT_MAP: Record<TemplateName, () => React.ReactElement> = {
   editorial:   ContentEditorial,
   tecnico:     ContentTecnico,
   negocios:    ContentNegocios,
+  revista:     ContentRevista,
+  lujo:        ContentLujo,
+  manuscrito:  ContentManuscrito,
 };
 
 /* ─── Modal ──────────────────────────────────────────────────── */

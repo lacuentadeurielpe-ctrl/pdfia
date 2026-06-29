@@ -42,11 +42,14 @@ const CALIDADES = [
 const TONOS = ["profesional", "educativo", "creativo", "técnico", "divulgativo", "motivacional"];
 
 const TEMPLATES: { id: TemplateName; label: string; desc: string; tag: string }[] = [
-  { id: "clasica",     label: "Clásica",     desc: "Portada degradada, bordes redondeados, sombra de marca",   tag: "Versátil"    },
+  { id: "clasica",     label: "Clásica",     desc: "Portada degradada, bordes redondeados, sombra de marca",      tag: "Versátil" },
   { id: "minimalista", label: "Minimalista", desc: "Blanco puro, borde izquierdo, drop cap, tipografía elegante", tag: "Clean"    },
-  { id: "editorial",  label: "Editorial",   desc: "Fotos flotantes, número decorativo, estilo revista",          tag: "Premium"  },
-  { id: "tecnico",    label: "Técnico",      desc: "Dark navy, sidebar, fuente monoespaciada, estilo doc",       tag: "Premium"  },
-  { id: "negocios",   label: "Negocios",    desc: "Header por página, barra de stats, estilo ejecutivo",         tag: "Premium"  },
+  { id: "editorial",   label: "Editorial",   desc: "Folio, drop cap, imágenes flotadas, estilo magazine",         tag: "Premium"  },
+  { id: "tecnico",     label: "Técnico",     desc: "Dark navy, sidebar, fuente monoespaciada, estilo doc",        tag: "Premium"  },
+  { id: "negocios",    label: "Negocios",    desc: "Header corporativo, barra de stats, estilo ejecutivo",        tag: "Premium"  },
+  { id: "revista",     label: "Revista",     desc: "Tipografía condensada, 2 columnas, color bloque, magazine",   tag: "Premium"  },
+  { id: "lujo",        label: "Lujo",        desc: "Cormorant Garamond, marco dorado, márgenes amplísimos",       tag: "Premium"  },
+  { id: "manuscrito",  label: "Manuscrito",  desc: "EB Garamond, sangría literaria, ornamentos, folio clásico",   tag: "Premium"  },
 ];
 
 const MODOS_IMAGEN: { id: ModoImagenes; label: string; desc: string; creditos: string }[] = [

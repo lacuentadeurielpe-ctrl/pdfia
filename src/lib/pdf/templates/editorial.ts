@@ -49,6 +49,10 @@ export function buildEditorial(
     return `
     <div class="section page-break">
       ${imgBleedBefore}
+      <div class="page-folio">
+        <span class="folio-title">${outline.bookTitle}</span>
+        <span class="folio-num">${String(i + 2).padStart(2, "0")}</span>
+      </div>
       <div class="section-inner">
         <div class="dec-num">${String(i + 1).padStart(2, "0")}</div>
         <div class="eyebrow">Capítulo ${String(i + 1).padStart(2, "0")}</div>
@@ -129,7 +133,15 @@ body{font-family:'Source Sans 3',sans-serif;color:var(--text);background:var(--b
 /* SECTIONS */
 .page-break{page-break-before:always;}
 .section{min-height:100vh;position:relative;}
-.section-inner{padding:80px 90px;position:relative;}
+
+/* Folio — encabezado de página con título y número */
+.page-folio{display:flex;justify-content:space-between;align-items:center;
+  padding:12px 90px;border-bottom:1px solid var(--border);
+  font-size:8pt;color:var(--muted);}
+.folio-title{font-style:italic;letter-spacing:.3px;}
+.folio-num{font-family:'Playfair Display',serif;font-size:10pt;font-weight:700;color:var(--a);}
+
+.section-inner{padding:52px 90px 80px;position:relative;}
 
 /* Número decorativo de capítulo — watermark detrás del título */
 .dec-num{position:absolute;top:40px;right:60px;font-family:'Playfair Display',serif;
@@ -161,6 +173,10 @@ body{font-family:'Source Sans 3',sans-serif;color:var(--text);background:var(--b
 .section-content{font-size:11.5pt;line-height:1.78;position:relative;z-index:1;}
 .section-content p{margin-bottom:18px;color:var(--text);text-align:justify;hyphens:auto;}
 .section-content>p:first-of-type{font-size:13pt;line-height:1.7;font-weight:400;}
+/* Drop cap — gran inicial en Playfair */
+.section-content>p:first-of-type::first-letter{float:left;font-family:'Playfair Display',serif;
+  font-size:3.8em;font-weight:800;line-height:.78;color:var(--a);
+  margin:6px 6px 0 0;padding:0;}
 .section-content h3{font-family:'Playfair Display',serif;font-size:14pt;font-weight:700;
   color:var(--text);margin:32px 0 13px;}
 .section-content h4{font-size:12pt;font-weight:600;color:var(--p);margin:22px 0 10px;}

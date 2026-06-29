@@ -5,6 +5,9 @@ import { buildMinimalista } from "./minimalista";
 import { buildEditorial } from "./editorial";
 import { buildTecnico } from "./tecnico";
 import { buildNegocios } from "./negocios";
+import { buildRevista } from "./revista";
+import { buildLujo } from "./lujo";
+import { buildManuscrito } from "./manuscrito";
 
 export type { BrandConfig, RenderOptions, TemplateName, ModoImagenes } from "./types";
 
@@ -14,6 +17,9 @@ const BUILDERS: Record<TemplateName, (o: Outline, s: Section[], b: BrandConfig, 
   editorial:   buildEditorial,
   tecnico:     buildTecnico,
   negocios:    buildNegocios,
+  revista:     buildRevista,
+  lujo:        buildLujo,
+  manuscrito:  buildManuscrito,
 };
 
 export function buildPDFHtml(

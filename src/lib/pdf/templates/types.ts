@@ -1,6 +1,6 @@
 import type { Outline, Section } from "@/lib/orchestrator/parser";
 
-export type TemplateName = "clasica" | "editorial" | "minimalista" | "tecnico" | "negocios";
+export type TemplateName = "clasica" | "editorial" | "minimalista" | "tecnico" | "negocios" | "revista" | "lujo" | "manuscrito";
 export type ModoImagenes = "ninguna" | "alternadas" | "todas";
 
 export interface BrandConfig {
