@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { TemplateName } from "@/lib/pdf/templates/index";
 
@@ -210,7 +211,7 @@ function ContentNegocios() {
   );
 }
 
-const COVER_MAP: Record<TemplateName, () => JSX.Element> = {
+const COVER_MAP: Record<TemplateName, () => React.ReactElement> = {
   clasica:     CoverClasica,
   minimalista: CoverMinimalista,
   editorial:   CoverEditorial,
@@ -218,7 +219,7 @@ const COVER_MAP: Record<TemplateName, () => JSX.Element> = {
   negocios:    CoverNegocios,
 };
 
-const CONTENT_MAP: Record<TemplateName, () => JSX.Element> = {
+const CONTENT_MAP: Record<TemplateName, () => React.ReactElement> = {
   clasica:     ContentClasica,
   minimalista: ContentMinimalista,
   editorial:   ContentEditorial,
