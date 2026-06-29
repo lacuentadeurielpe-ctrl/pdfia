@@ -100,8 +100,8 @@ body{font-family:'Lora',serif;color:var(--text);background:var(--bg);font-size:1
 .section-subtitle{font-size:13.5pt;color:var(--muted);font-style:italic;
   line-height:1.6;margin-bottom:32px;max-width:88%;}
 
-/* Imagen minimalista: centrada al 78%, borde fino, sombra suave, leve desaturación */
-.section-image{width:78%;margin:4px auto 44px;display:block;overflow:hidden;
+/* Imagen minimalista: centrada al 68% (4:3 aireada), borde fino, sombra suave, leve desaturación */
+.section-image{width:68%;margin:8px auto 44px;display:block;overflow:hidden;border-radius:4px;
   border:1px solid #dde1e7;
   box-shadow:0 8px 32px rgba(0,0,0,.09),0 1px 4px rgba(0,0,0,.05);}
 .section-image img{width:100%;height:auto;display:block;filter:grayscale(8%) contrast(1.02);}

@@ -10,13 +10,16 @@ function enrichPrompt(
   rawPrompt: string,
   sectionTitle: string,
   brandColors: { primario: string; secundario: string; acento: string },
-  style: string
+  style: string,
+  aspectRatio: string
 ): string {
+  const [w, h] = aspectRatio.split(":").map(Number);
+  const orientacion = h > w ? "vertical (retrato)" : w > h ? "horizontal (apaisada)" : "cuadrada";
   return `${rawPrompt}
 
 Estilo visual: ${style}, profesional, moderno.
 Paleta de colores dominante: ${brandColors.primario} como color principal, ${brandColors.acento} como acento.
-Composición: horizontal (16:9), alta resolución, limpia y visualmente impactante.
+Composición: ${orientacion}, proporción ${aspectRatio}, alta resolución, limpia y visualmente impactante.
 Contexto: ilustración para el capítulo "${sectionTitle}" de un ebook profesional.
 Sin texto superpuesto. Sin marcos ni bordes. Fondo apropiado para el tema.
 Calidad fotográfica o ilustrativa premium, estilo editorial.`;
@@ -61,7 +64,8 @@ export async function generateImage(
   sectionOrder: number,
   brandColors: { primario: string; secundario: string; acento: string },
   style: string,
-  imageModels: string | string[] = DEFAULT_IMAGE_MODEL
+  imageModels: string | string[] = DEFAULT_IMAGE_MODEL,
+  aspectRatio: string = "16:9"
 ): Promise<string | null> {
   if (imageComplexity === "none" || !imagePrompt.trim()) {
     console.log(`[image-agent] Sección ${sectionOrder} omitida — complexity=${imageComplexity}`);
@@ -70,7 +74,7 @@ export async function generateImage(
 
   // Acepta un modelo o una lista (vía con fallback)
   const modelos = Array.isArray(imageModels) ? imageModels : [imageModels];
-  const finalPrompt = enrichPrompt(imagePrompt, sectionTitle, brandColors, style);
+  const finalPrompt = enrichPrompt(imagePrompt, sectionTitle, brandColors, style, aspectRatio);
 
   const apiKey =
     process.env.GEMINI_API_KEY ||
@@ -85,11 +89,11 @@ export async function generateImage(
   const ai = new GoogleGenAI({ apiKey });
 
   // Probar cada modelo de la vía en orden hasta que uno entregue imagen.
-  // 1ª pasada: pedir 16:9 (imágenes horizontales nativas, sin recorte).
+  // 1ª pasada: pedir la proporción nativa de la plantilla (sin recorte).
   let imagen: { data: string; mime: string } | null = null;
   for (const model of modelos) {
-    console.log(`[image-agent] Sección ${sectionOrder} — intentando ${model} 16:9 ("${sectionTitle}")`);
-    imagen = await intentarModelo(ai, model, finalPrompt, sectionOrder, "16:9");
+    console.log(`[image-agent] Sección ${sectionOrder} — intentando ${model} ${aspectRatio} ("${sectionTitle}")`);
+    imagen = await intentarModelo(ai, model, finalPrompt, sectionOrder, aspectRatio);
     if (imagen) break;
   }
 

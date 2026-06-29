@@ -3,6 +3,7 @@ import { runDirector } from "./director";
 import { writeSection } from "./writer";
 import { generateImage } from "./image-agent";
 import { buildPDFHtml } from "@/lib/pdf/templates/index";
+import { imageAspectRatio } from "@/lib/pdf/templates/image-format";
 import type { ModoImagenes, TemplateName } from "@/lib/pdf/templates/index";
 import { costoReal } from "@/lib/planes/config";
 import { descontarCreditos } from "@/lib/planes/creditos";
@@ -248,9 +249,14 @@ export async function runResumable(
         progress: 78,
       });
 
+      // Índice 0-based de cada capítulo (en orden) para decidir la forma de su imagen
+      const ordenToIndex = new Map(chapters.map((c, i) => [c.orden, i]));
+
       let listas = 0;
       await Promise.all(
         pending.map(async (c) => {
+          const idx = ordenToIndex.get(c.orden) ?? Math.max(0, c.orden - 1);
+          const aspectRatio = imageAspectRatio(plantilla, idx);
           const url = await generateImage(
             c.image_prompt,
             c.image_complexity as Section["imageComplexity"],
@@ -259,7 +265,8 @@ export async function runResumable(
             c.orden,
             { primario: brand.colorPrimario, secundario: brand.colorSecundario, acento: brand.colorAcento },
             outline!.style,
-            models.imageModels
+            models.imageModels,
+            aspectRatio
           );
           if (url) {
             await supabaseAdmin
