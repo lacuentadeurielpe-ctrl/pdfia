@@ -6,7 +6,7 @@
 
 import type { Calidad, ViaImagen } from "@/lib/orchestrator/models";
 
-export type PlanId = "gratis" | "emprendedor" | "profesional" | "agencia";
+export type PlanId = "gratis" | "creador" | "estudio";
 
 // ── Costo en CRÉDITOS de cada acción ──
 // El texto es casi gratis; las imágenes son el costo real. Por eso:
@@ -50,7 +50,7 @@ export const PLANES: Record<PlanId, PlanInterno> = {
     id: "gratis",
     nombre: "Gratis",
     precioSoles: 0,
-    creditos: 5,
+    creditos: 8,
     calidades: ["estandar"],
     permiteImagenes: false,
     viaImagenPorCalidad: { estandar: null, avanzado: null, premium: null },
@@ -59,43 +59,28 @@ export const PLANES: Record<PlanId, PlanInterno> = {
     marcaPersonalizada: false,
     historialDias: 7,
     soporte: "comunidad",
-    externos: derivarExternos(5),
+    externos: derivarExternos(8),
   },
-  emprendedor: {
-    id: "emprendedor",
-    nombre: "Emprendedor",
-    precioSoles: 45,
-    creditos: 120,
+  creador: {
+    id: "creador",
+    nombre: "Creador",
+    precioSoles: 49,
+    creditos: 180,
     calidades: ["estandar", "avanzado"],
     permiteImagenes: true,
     viaImagenPorCalidad: { estandar: "flash", avanzado: "flash", premium: null },
-    capitulosMax: 10,
-    marcaDeAgua: false,
-    marcaPersonalizada: true,
-    historialDias: null,
-    soporte: "email",
-    externos: derivarExternos(120),
-  },
-  profesional: {
-    id: "profesional",
-    nombre: "Profesional",
-    precioSoles: 89,
-    creditos: 300,
-    calidades: ["estandar", "avanzado", "premium"],
-    permiteImagenes: true,
-    viaImagenPorCalidad: { estandar: "flash", avanzado: "flash", premium: "pro" },
     capitulosMax: 12,
     marcaDeAgua: false,
     marcaPersonalizada: true,
     historialDias: null,
     soporte: "prioritario",
-    externos: derivarExternos(300),
+    externos: derivarExternos(180),
   },
-  agencia: {
-    id: "agencia",
-    nombre: "Agencia",
-    precioSoles: 189,
-    creditos: 750,
+  estudio: {
+    id: "estudio",
+    nombre: "Estudio",
+    precioSoles: 119,
+    creditos: 550,
     calidades: ["estandar", "avanzado", "premium"],
     permiteImagenes: true,
     viaImagenPorCalidad: { estandar: "flash", avanzado: "flash", premium: "pro" },
@@ -104,7 +89,7 @@ export const PLANES: Record<PlanId, PlanInterno> = {
     marcaPersonalizada: true,
     historialDias: null,
     soporte: "dedicado",
-    externos: derivarExternos(750),
+    externos: derivarExternos(550),
   },
 };
 
@@ -114,7 +99,7 @@ export const DEV_UNLOCK_ALL = true;
 
 // Plan con todo desbloqueado — usado por DEV_UNLOCK_ALL y por usuarios "ilimitado" del admin.
 export const PLAN_DEV_UNLOCKED: PlanInterno = {
-  id:                  "agencia",
+  id:                  "estudio",
   nombre:              "Ilimitado",
   precioSoles:         0,
   creditos:            9999,

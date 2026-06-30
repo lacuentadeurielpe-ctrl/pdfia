@@ -12,9 +12,8 @@ interface Cliente {
 const FILTROS = [
   { id: "", label: "Todos" },
   { id: "gratis", label: "Gratis" },
-  { id: "emprendedor", label: "Emprendedor" },
-  { id: "profesional", label: "Profesional" },
-  { id: "agencia", label: "Agencia" },
+  { id: "creador", label: "Creador" },
+  { id: "estudio", label: "Estudio" },
   { id: "ilimitado", label: "Ilimitados" },
 ];
 

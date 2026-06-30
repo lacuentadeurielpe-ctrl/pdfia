@@ -14,7 +14,7 @@ interface Metricas {
 }
 
 const PLAN_LABEL: Record<string, string> = {
-  gratis: "Gratis", emprendedor: "Emprendedor", profesional: "Profesional", agencia: "Agencia",
+  gratis: "Gratis", creador: "Creador", estudio: "Estudio",
 };
 
 export default function AdminHome() {

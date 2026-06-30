@@ -14,8 +14,9 @@ interface Detalle {
 }
 
 const PLANES = [
-  { id: "gratis", label: "Gratis" }, { id: "emprendedor", label: "Emprendedor" },
-  { id: "profesional", label: "Profesional" }, { id: "agencia", label: "Agencia" },
+  { id: "gratis", label: "Gratis" },
+  { id: "creador", label: "Creador" },
+  { id: "estudio", label: "Estudio" },
 ];
 
 function fecha(s: string | null) { return s ? new Date(s).toLocaleDateString("es-PE", { day: "2-digit", month: "short", year: "numeric" }) : "—"; }

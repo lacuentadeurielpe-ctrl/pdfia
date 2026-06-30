@@ -115,31 +115,24 @@ const TESTIMONIOS = [
 
 const PLANES = [
   {
-    id: "gratis",     nombre: "Gratis",       precio: "S/ 0",   periodo: "/mes", destacado: false, badge: null,         color: "gray",
-    ebooksMes: "5",
-    desc: "Ideal para probar FoxPDF sin compromiso.",
-    includes: ["5 créditos/mes", "Calidad Estándar (Claude Haiku)", "Hasta 5 capítulos por ebook", "Historial 7 días", "Licencia comercial"],
-    excludes: ["Imágenes IA", "Tu marca y colores", "Calidad Avanzado / Premium"],
+    id: "gratis",  nombre: "Gratis",  precio: "S/ 0",   periodo: "",     destacado: false, badge: null,         color: "gray",
+    ebooksMes: "8",
+    desc: "Pruébalo gratis, sin tarjeta ni compromiso.",
+    includes: ["8 créditos para empezar", "2 plantillas base", "Hasta 5 capítulos por ebook", "Historial 7 días", "Licencia comercial"],
+    excludes: ["Imágenes IA", "Plantillas premium", "Tu marca y colores"],
   },
   {
-    id: "emprendedor", nombre: "Emprendedor", precio: "S/ 45",  periodo: "/mes", destacado: false, badge: null,         color: "indigo",
-    ebooksMes: "120",
-    desc: "Para creadores que venden contenido digital.",
-    includes: ["120 créditos/mes", "Calidad Estándar + Avanzado", "Imágenes IA incluidas (Gemini Flash)", "Hasta 10 capítulos", "Historial ilimitado", "Tu marca, logo y colores", "Soporte por email", "Licencia comercial"],
-    excludes: ["Calidad Premium (Claude Opus)", "Imágenes IA Pro"],
-  },
-  {
-    id: "profesional", nombre: "Profesional", precio: "S/ 89",  periodo: "/mes", destacado: true,  badge: "MÁS POPULAR", color: "orange",
-    ebooksMes: "300",
-    desc: "Para agencias y creadores de contenido premium.",
-    includes: ["300 créditos/mes", "Todas las calidades (Estándar · Avanzado · Premium)", "Imágenes IA Pro (Gemini alta calidad)", "Hasta 12 capítulos", "Historial ilimitado", "Tu marca, logo y colores", "Soporte prioritario", "Licencia comercial"],
+    id: "creador", nombre: "Creador", precio: "S/ 49",  periodo: "/mes", destacado: true,  badge: "MÁS POPULAR", color: "orange",
+    ebooksMes: "30",
+    desc: "Todo lo que necesitas para crear y vender.",
+    includes: ["180 créditos/mes", "Las 8 plantillas premium", "Imágenes IA incluidas", "Sin marca de agua", "Tu logo, colores y marca", "Hasta 12 capítulos", "Historial ilimitado", "Soporte prioritario", "Licencia comercial"],
     excludes: [],
   },
   {
-    id: "agencia",    nombre: "Agencia",      precio: "S/ 189", periodo: "/mes", destacado: false, badge: "PARA EQUIPOS", color: "amber",
-    ebooksMes: "750",
-    desc: "Volumen máximo para equipos y agencias digitales.",
-    includes: ["750 créditos/mes", "Todas las calidades (Estándar · Avanzado · Premium)", "Imágenes IA Pro (máxima calidad)", "Hasta 15 capítulos", "Historial ilimitado", "Tu marca, logo y colores", "Soporte dedicado", "Licencia comercial"],
+    id: "estudio", nombre: "Estudio", precio: "S/ 119", periodo: "/mes", destacado: false, badge: "MÁS PODER", color: "amber",
+    ebooksMes: "90",
+    desc: "Volumen y máxima calidad para producir en serie.",
+    includes: ["550 créditos/mes", "Todo lo del plan Creador", "Imágenes Premium (Gemini Pro)", "Calidad de texto máxima (Opus)", "Hasta 15 capítulos", "Historial ilimitado", "Soporte dedicado", "Licencia comercial"],
     excludes: [],
   },
 ];
@@ -582,7 +575,7 @@ export default async function LandingPage() {
             ))}
           </div>
 
-          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-5 items-stretch">
+          <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-5 items-stretch max-w-5xl mx-auto">
             {PLANES.map((plan) => {
               const colorAccent = ACCENTS[plan.color as keyof typeof ACCENTS];
               return (

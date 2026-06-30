@@ -1,61 +1,46 @@
 "use client";
 import { useState } from "react";
-import { Check, Zap, Star, Crown, Building2, Loader2 } from "lucide-react";
+import { Check, Zap, Crown, Building2, Loader2 } from "lucide-react";
 import { PLANES, type PlanId } from "@/lib/planes/config";
 
 const ICONOS: Record<PlanId, React.ElementType> = {
-  gratis:      Zap,
-  emprendedor: Star,
-  profesional: Crown,
-  agencia:     Building2,
+  gratis:  Zap,
+  creador: Crown,
+  estudio: Building2,
 };
 
 const COLORES: Record<PlanId, { ring: string; badge: string; btn: string; icon: string }> = {
-  gratis:      { ring: "border-gray-700",  badge: "bg-gray-800 text-gray-300",        btn: "bg-gray-700 hover:bg-gray-600",        icon: "text-gray-400"   },
-  emprendedor: { ring: "border-indigo-500",badge: "bg-indigo-600/20 text-indigo-300", btn: "bg-indigo-600 hover:bg-indigo-500",    icon: "text-indigo-400" },
-  profesional: { ring: "border-purple-500",badge: "bg-purple-600/20 text-purple-300", btn: "bg-purple-600 hover:bg-purple-500",    icon: "text-purple-400" },
-  agencia:     { ring: "border-amber-500", badge: "bg-amber-600/20 text-amber-300",   btn: "bg-amber-500  hover:bg-amber-400",     icon: "text-amber-400"  },
+  gratis:  { ring: "border-gray-700",   badge: "bg-gray-800 text-gray-300",        btn: "bg-gray-700 hover:bg-gray-600",     icon: "text-gray-400"   },
+  creador: { ring: "border-purple-500", badge: "bg-purple-600/20 text-purple-300", btn: "bg-purple-600 hover:bg-purple-500", icon: "text-purple-400" },
+  estudio: { ring: "border-amber-500",  badge: "bg-amber-600/20 text-amber-300",   btn: "bg-amber-500  hover:bg-amber-400",  icon: "text-amber-400"  },
 };
 
 const FEATURES: Record<PlanId, string[]> = {
   gratis: [
-    `~${PLANES.gratis.externos.ebooksSinImagen} ebook/mes (sin imágenes)`,
-    "Calidad Estándar",
+    `~${PLANES.gratis.externos.ebooksSinImagen} ebooks/mes para probar`,
+    "2 plantillas base",
     "Hasta 5 capítulos",
     "Historial 7 días",
     "Marca de agua FoxPDF",
     "Soporte comunidad",
   ],
-  emprendedor: [
-    `~${PLANES.emprendedor.externos.ebooksSinImagen} ebooks/mes sin imágenes`,
-    `~${PLANES.emprendedor.externos.ebooksConImagen} ebooks/mes con imágenes`,
-    "Calidad Estándar + Avanzado",
-    "Imágenes IA (Flash)",
-    "Hasta 10 capítulos",
-    "Historial ilimitado",
-    "Marca personalizada",
-    "Soporte email",
-    "Licencia comercial",
-  ],
-  profesional: [
-    `~${PLANES.profesional.externos.ebooksSinImagen} ebooks/mes sin imágenes`,
-    `~${PLANES.profesional.externos.ebooksConImagen} ebooks/mes con imágenes`,
-    "Calidad Estándar + Avanzado + Premium",
-    "Imágenes IA Flash + Pro (alta calidad)",
+  creador: [
+    `~${PLANES.creador.externos.ebooksConImagen} ebooks/mes con imágenes`,
+    "Las 8 plantillas premium",
+    "Imágenes IA incluidas",
+    "Sin marca de agua",
+    "Tu logo y tus colores",
     "Hasta 12 capítulos",
     "Historial ilimitado",
-    "Marca personalizada",
     "Soporte prioritario",
     "Licencia comercial",
   ],
-  agencia: [
-    `~${PLANES.agencia.externos.ebooksSinImagen} ebooks/mes sin imágenes`,
-    `~${PLANES.agencia.externos.ebooksConImagen} ebooks/mes con imágenes`,
-    "Todas las calidades",
-    "Imágenes IA máxima calidad",
+  estudio: [
+    `~${PLANES.estudio.externos.ebooksConImagen} ebooks/mes con imágenes`,
+    "Todo lo de Creador, y además:",
+    "Imágenes Premium (Gemini Pro)",
+    "Calidad de texto máxima (Opus)",
     "Hasta 15 capítulos",
-    "Historial ilimitado",
-    "Marca personalizada",
     "Soporte dedicado",
     "Licencia comercial",
   ],
@@ -65,7 +50,7 @@ interface Props {
   planActual: PlanId;
 }
 
-const ORDEN: PlanId[] = ["gratis", "emprendedor", "profesional", "agencia"];
+const ORDEN: PlanId[] = ["gratis", "creador", "estudio"];
 
 export default function PlanesCards({ planActual }: Props) {
   const [loading, setLoading] = useState<PlanId | null>(null);
@@ -100,7 +85,7 @@ export default function PlanesCards({ planActual }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {ORDEN.map((planId) => {
           const plan      = PLANES[planId];
           const colores   = COLORES[planId];
@@ -123,7 +108,7 @@ export default function PlanesCards({ planActual }: Props) {
                   Plan actual
                 </div>
               )}
-              {planId === "profesional" && !esCurrent && (
+              {planId === "creador" && !esCurrent && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-bold bg-purple-600/20 text-purple-300">
                   Más popular
                 </div>

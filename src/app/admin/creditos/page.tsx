@@ -4,10 +4,9 @@ import { Gift, Check, AlertTriangle } from "lucide-react";
 
 const GRUPOS = [
   { id: "todos",            label: "Todos los usuarios" },
-  { id: "plan:gratis",      label: "Plan Gratis" },
-  { id: "plan:emprendedor", label: "Plan Emprendedor" },
-  { id: "plan:profesional", label: "Plan Profesional" },
-  { id: "plan:agencia",     label: "Plan Agencia" },
+  { id: "plan:gratis",   label: "Plan Gratis" },
+  { id: "plan:creador",  label: "Plan Creador" },
+  { id: "plan:estudio",  label: "Plan Estudio" },
   { id: "ilimitado",        label: "Cuentas ilimitadas" },
   { id: "lista",            label: "Lista de correos" },
 ];
