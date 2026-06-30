@@ -15,34 +15,42 @@ const COLORES: Record<PlanId, { ring: string; badge: string; btn: string; icon: 
   estudio: { ring: "border-amber-500",  badge: "bg-amber-600/20 text-amber-300",   btn: "bg-amber-500  hover:bg-amber-400",  icon: "text-amber-400"  },
 };
 
+// Subtítulo de marketing que aparece debajo del precio
+const TAGLINES: Record<PlanId, string> = {
+  gratis:  "Para explorar y descubrir",
+  creador: "Para crear y vender",
+  estudio: "Para producir a escala",
+};
+
 const FEATURES: Record<PlanId, string[]> = {
   gratis: [
-    `~${PLANES.gratis.externos.ebooksSinImagen} ebooks/mes para probar`,
-    "2 plantillas base",
-    "Hasta 5 capítulos",
-    "Historial 7 días",
-    "Marca de agua FoxPDF",
-    "Soporte comunidad",
+    `Hasta ${PLANES.gratis.externos.ebooksSinImagen} ebooks al mes — siempre gratis`,
+    "2 plantillas de diseño incluidas",
+    "Ebooks de hasta 5 capítulos",
+    "Licencia comercial incluida",
+    "Historial de los últimos 7 días",
+    "Soporte de la comunidad",
   ],
   creador: [
-    `~${PLANES.creador.externos.ebooksConImagen} ebooks/mes con imágenes`,
-    "Las 8 plantillas premium",
-    "Imágenes IA incluidas",
-    "Sin marca de agua",
-    "Tu logo y tus colores",
-    "Hasta 12 capítulos",
-    "Historial ilimitado",
-    "Soporte prioritario",
-    "Licencia comercial",
+    `Hasta ${PLANES.creador.externos.ebooksSinImagen} ebooks al mes`,
+    `Hasta ${PLANES.creador.externos.ebooksConImagen} ebooks al mes con imágenes IA`,
+    "Las 8 plantillas premium desbloqueadas",
+    "Imágenes IA originales por capítulo",
+    "100% tu marca — sin sello de terceros",
+    "Tu logo, colores e identidad visual",
+    "Ebooks de hasta 12 capítulos",
+    "Historial y descargas ilimitadas",
+    "Licencia comercial incluida",
   ],
   estudio: [
-    `~${PLANES.estudio.externos.ebooksConImagen} ebooks/mes con imágenes`,
-    "Todo lo de Creador, y además:",
-    "Imágenes Premium (Gemini Pro)",
-    "Calidad de texto máxima (Opus)",
-    "Hasta 15 capítulos",
-    "Soporte dedicado",
-    "Licencia comercial",
+    `Hasta ${PLANES.estudio.externos.ebooksSinImagen} ebooks al mes`,
+    `Hasta ${PLANES.estudio.externos.ebooksConImagen} ebooks al mes con imágenes Pro`,
+    "Todo lo del plan Creador, más:",
+    "Imágenes Premium (Gemini Pro — máxima calidad)",
+    "Redacción Ultra-Densa (Claude Opus)",
+    "Ebooks de hasta 15 capítulos",
+    "Soporte dedicado con respuesta rápida",
+    "Licencia comercial incluida",
   ],
 };
 
@@ -116,11 +124,16 @@ export default function PlanesCards({ planActual }: Props) {
 
               {/* Header */}
               <div className="mb-5">
-                <div className={`w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center mb-3`}>
-                  <Icon className={`w-5 h-5 ${colores.icon}`} />
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center">
+                    <Icon className={`w-5 h-5 ${colores.icon}`} />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg leading-tight">{plan.nombre}</h3>
+                    <p className="text-xs text-gray-500">{TAGLINES[planId]}</p>
+                  </div>
                 </div>
-                <h3 className="text-white font-bold text-lg">{plan.nombre}</h3>
-                <div className="flex items-baseline gap-1 mt-1">
+                <div className="flex items-baseline gap-1">
                   {plan.precioSoles === 0 ? (
                     <span className="text-3xl font-black text-white">Gratis</span>
                   ) : (
@@ -130,7 +143,17 @@ export default function PlanesCards({ planActual }: Props) {
                     </>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{plan.creditos} créditos · ciclo mensual</p>
+                {/* Métrica hero — el número más impactante del plan */}
+                <div className={`mt-3 rounded-xl px-3 py-2 text-center border ${
+                  planId === "gratis" ? "bg-gray-800/50 border-gray-700"
+                  : planId === "creador" ? "bg-purple-600/10 border-purple-500/30"
+                  : "bg-amber-600/10 border-amber-500/30"
+                }`}>
+                  <span className={`text-2xl font-black ${colores.icon}`}>
+                    {plan.externos.ebooksSinImagen.toLocaleString()}
+                  </span>
+                  <span className="text-gray-400 text-xs ml-1">ebooks/mes posibles</span>
+                </div>
               </div>
 
               {/* Features */}
@@ -149,8 +172,8 @@ export default function PlanesCards({ planActual }: Props) {
                   Plan activo
                 </div>
               ) : esMenor ? (
-                <div className="w-full py-2.5 rounded-xl text-center text-sm text-gray-600 bg-gray-800/50">
-                  Plan inferior
+                <div className="w-full py-2.5 rounded-xl text-center text-sm text-gray-600 bg-gray-800/30 border border-gray-800">
+                  Ya incluido en tu plan
                 </div>
               ) : (
                 <button

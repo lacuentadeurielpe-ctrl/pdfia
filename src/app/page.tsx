@@ -115,24 +115,24 @@ const TESTIMONIOS = [
 
 const PLANES = [
   {
-    id: "gratis",  nombre: "Gratis",  precio: "S/ 0",   periodo: "",     destacado: false, badge: null,         color: "gray",
-    ebooksMes: "8",
-    desc: "Pruébalo gratis, sin tarjeta ni compromiso.",
-    includes: ["8 créditos para empezar", "2 plantillas base", "Hasta 5 capítulos por ebook", "Historial 7 días", "Licencia comercial"],
-    excludes: ["Imágenes IA", "Plantillas premium", "Tu marca y colores"],
+    id: "gratis",  nombre: "Gratis",  precio: "S/ 0",   periodo: "",     destacado: false, badge: null,           color: "gray",
+    ebooksMes: "8",    ebooksSub: "ebooks gratis al mes — para siempre",
+    desc: "Sin tarjeta, sin trampa. Empieza hoy y descubre lo que la IA puede hacer por ti.",
+    includes: ["8 ebooks al mes incluidos", "2 plantillas de diseño", "Hasta 5 capítulos por ebook", "Licencia comercial incluida"],
+    excludes: ["Imágenes IA por capítulo", "Las 8 plantillas premium", "Tu marca, logo y colores"],
   },
   {
-    id: "creador", nombre: "Creador", precio: "S/ 49",  periodo: "/mes", destacado: true,  badge: "MÁS POPULAR", color: "orange",
-    ebooksMes: "30",
-    desc: "Todo lo que necesitas para crear y vender.",
-    includes: ["180 créditos/mes", "Las 8 plantillas premium", "Imágenes IA incluidas", "Sin marca de agua", "Tu logo, colores y marca", "Hasta 12 capítulos", "Historial ilimitado", "Soporte prioritario", "Licencia comercial"],
+    id: "creador", nombre: "Creador", precio: "S/ 49",  periodo: "/mes", destacado: true,  badge: "MÁS POPULAR",  color: "orange",
+    ebooksMes: "180",  ebooksSub: "ebooks posibles al mes — o 30 con imágenes IA",
+    desc: "Crea, vende y escala. Todo lo que necesitas para convertir tu conocimiento en ingresos reales.",
+    includes: ["Hasta 180 ebooks/mes (o 30 con imágenes)", "Las 8 plantillas premium", "Imágenes IA originales incluidas", "100% tu marca — sin sello de terceros", "Tu logo, colores e identidad", "Hasta 12 capítulos", "Historial ilimitado", "Licencia comercial"],
     excludes: [],
   },
   {
-    id: "estudio", nombre: "Estudio", precio: "S/ 119", periodo: "/mes", destacado: false, badge: "MÁS PODER", color: "amber",
-    ebooksMes: "90",
-    desc: "Volumen y máxima calidad para producir en serie.",
-    includes: ["550 créditos/mes", "Todo lo del plan Creador", "Imágenes Premium (Gemini Pro)", "Calidad de texto máxima (Opus)", "Hasta 15 capítulos", "Historial ilimitado", "Soporte dedicado", "Licencia comercial"],
+    id: "estudio", nombre: "Estudio", precio: "S/ 119", periodo: "/mes", destacado: false, badge: "PRODUCCIÓN TOTAL", color: "amber",
+    ebooksMes: "550",  ebooksSub: "ebooks posibles al mes — o 91 con imágenes Pro",
+    desc: "Para quienes producen en serio. Volumen máximo con la IA más potente disponible.",
+    includes: ["Hasta 550 ebooks/mes (o 91 con imágenes)", "Todo lo de Creador, más:", "Imágenes Premium (Gemini Pro)", "Redacción Ultra-Densa (Claude Opus)", "Hasta 15 capítulos", "Soporte dedicado", "Licencia comercial"],
     excludes: [],
   },
 ];
@@ -604,9 +604,8 @@ export default async function LandingPage() {
                     <p className="text-gray-400 text-xs mb-4">{plan.desc}</p>
 
                     <div className="rounded-xl bg-gray-800/60 border border-gray-700/50 px-4 py-3 mb-5 text-center">
-                      <p className="text-gray-500 text-xs mb-1">hasta</p>
-                      <p className={`text-2xl font-black ${colorAccent.num}`}>{plan.ebooksMes} ebooks</p>
-                      <p className="text-gray-500 text-xs mt-0.5">{plan.id === "gratis" ? "al mes para probar" : "al mes con imágenes"}</p>
+                      <p className={`text-3xl font-black ${colorAccent.num}`}>{plan.ebooksMes}</p>
+                      <p className="text-gray-400 text-xs mt-1 leading-snug">{plan.ebooksSub}</p>
                     </div>
 
                     <Link
