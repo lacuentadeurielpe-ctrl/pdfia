@@ -120,17 +120,22 @@ export function getPlan(id: string | null | undefined): PlanInterno {
 }
 
 // ── Cálculo de costo en créditos de un ebook ──
-// Estimado (antes de generar): asume que cada capítulo lleva 1 imagen → peor caso.
+// modoImagenes define cuántas imágenes se generan realmente:
+//   "ninguna"  → 0 imágenes
+//   "alternadas" → una cada dos capítulos (~50%)
+//   "todas"    → una por capítulo (peor caso)
 export function costoEstimado(
   calidad: Calidad,
   conImagenes: boolean,
-  numCapitulos: number
+  numCapitulos: number,
+  modoImagenes: "ninguna" | "alternadas" | "todas" = "todas"
 ): number {
   let costo = COSTO_CREDITOS.ebookBase;
-  if (conImagenes) {
+  if (conImagenes && modoImagenes !== "ninguna") {
     const via = calidad === "premium" ? "pro" : "flash";
     const costoImg = via === "pro" ? COSTO_CREDITOS.imagenPro : COSTO_CREDITOS.imagenFlash;
-    costo += numCapitulos * costoImg;
+    const imgs = modoImagenes === "alternadas" ? Math.ceil(numCapitulos / 2) : numCapitulos;
+    costo += imgs * costoImg;
   }
   return costo;
 }

@@ -19,8 +19,8 @@ export async function POST(req: NextRequest) {
   }
 
   const calidadFinal = (CALIDADES_VALIDAS.includes(calidad) ? calidad : "estandar") as Calidad;
-  const numCapitulos = Math.max(3, Math.min(15, Number(capitulos) || 5));
   const conImagenes = !!incluirImagenes;
+  const modoFinal = (["ninguna","alternadas","todas"].includes(modoImagenes) ? modoImagenes : (conImagenes ? "todas" : "ninguna")) as "ninguna"|"alternadas"|"todas";
 
   // ── Validar contra el plan del usuario ──
   const { plan, disponibles } = await getOrCreateSuscripcion(user.id);
@@ -41,11 +41,12 @@ export async function POST(req: NextRequest) {
     }, { status: 403 });
   }
 
-  // 3. ¿Excede el máximo de capítulos del plan?
-  const capFinal = Math.min(numCapitulos, plan.capitulosMax);
+  // 3. Capítulos: validar contra límite del plan (no hardcoded)
+  const numCapitulos = Math.max(3, Math.min(plan.capitulosMax, Number(capitulos) || 5));
+  const capFinal = numCapitulos;
 
-  // 4. ¿Tiene créditos suficientes (estimado del peor caso)?
-  const estimado = costoEstimado(calidadFinal, conImagenes, capFinal);
+  // 4. Créditos suficientes — respeta modoImagenes (alternadas = ~50% imágenes)
+  const estimado = costoEstimado(calidadFinal, conImagenes, capFinal, modoFinal);
   if (disponibles < estimado) {
     return NextResponse.json({
       error: `No te alcanzan los créditos. Este ebook cuesta ~${estimado} créditos y te quedan ${disponibles}. Renueva o mejora tu plan.`,
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
       tono:             tono ?? "profesional",
       estado:           "pendiente",
       plantilla:        plantilla ?? "clasica",
-      modo_imagenes:    modoImagenes ?? (conImagenes ? "todas" : "ninguna"),
+      modo_imagenes:    modoFinal,
     })
     .select("id")
     .single();
