@@ -4,7 +4,7 @@
 // ════════════════════════════════════════════════════════════════════
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPlan, DEV_UNLOCK_ALL, type PlanId, type PlanInterno } from "./config";
+import { getPlan, PLAN_DEV_UNLOCKED, DEV_UNLOCK_ALL, type PlanId, type PlanInterno } from "./config";
 
 export interface Suscripcion {
   user_id:          string;
@@ -13,7 +13,10 @@ export interface Suscripcion {
   creditos_usados:  number;
   ciclo_inicio:     string;
   ciclo_fin:        string;
+  ilimitado?:       boolean;
 }
+
+const SUS_COLS = "user_id, plan, creditos_totales, creditos_usados, ciclo_inicio, ciclo_fin, ilimitado";
 
 export interface EstadoCreditos {
   suscripcion:  Suscripcion;
@@ -31,7 +34,7 @@ export async function getOrCreateSuscripcion(userId: string): Promise<EstadoCred
   // 1. Buscar suscripción existente
   let { data: sus } = await admin
     .from("suscripciones")
-    .select("user_id, plan, creditos_totales, creditos_usados, ciclo_inicio, ciclo_fin")
+    .select(SUS_COLS)
     .eq("user_id", userId)
     .single();
 
@@ -53,13 +56,13 @@ export async function getOrCreateSuscripcion(userId: string): Promise<EstadoCred
         },
         { onConflict: "user_id", ignoreDuplicates: true }
       )
-      .select("user_id, plan, creditos_totales, creditos_usados, ciclo_inicio, ciclo_fin")
+      .select(SUS_COLS)
       .single();
     // Si ignoreDuplicates=true y ya existía, re-fetch
     if (!nueva) {
       const { data: refetch } = await admin
         .from("suscripciones")
-        .select("user_id, plan, creditos_totales, creditos_usados, ciclo_inicio, ciclo_fin")
+        .select(SUS_COLS)
         .eq("user_id", userId)
         .single();
       sus = refetch;
@@ -106,13 +109,15 @@ export async function getOrCreateSuscripcion(userId: string): Promise<EstadoCred
         updated_at:       ahora.toISOString(),
       })
       .eq("user_id", userId)
-      .select("user_id, plan, creditos_totales, creditos_usados, ciclo_inicio, ciclo_fin")
+      .select(SUS_COLS)
       .single();
     if (renovada) suscripcion = renovada as Suscripcion;
   }
 
-  const plan = getPlan(suscripcion.plan);
-  const disponibles = DEV_UNLOCK_ALL
+  // Usuario "ilimitado" (asignado por el admin) o modo DEV → plan y créditos desbloqueados.
+  const ilimitado = DEV_UNLOCK_ALL || suscripcion.ilimitado === true;
+  const plan = ilimitado ? PLAN_DEV_UNLOCKED : getPlan(suscripcion.plan);
+  const disponibles = ilimitado
     ? 9999
     : Math.max(0, suscripcion.creditos_totales - suscripcion.creditos_usados);
 

@@ -1,11 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { getOrCreateSuscripcion } from "@/lib/planes/creditos";
+import { esAdmin } from "@/lib/auth/admin";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Clock, FileText, TrendingUp, CreditCard, AlertTriangle } from "lucide-react";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+
+  // El superadmin entra por el login normal pero va directo a su panel.
+  if (user && await esAdmin(user.id, user.email)) redirect("/admin");
 
   // Fecha de inicio de la semana actual
   const inicioSemana = new Date();
