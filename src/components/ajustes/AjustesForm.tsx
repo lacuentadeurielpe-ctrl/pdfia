@@ -95,7 +95,7 @@ export default function AjustesForm({ config, userId, marcaPersonalizada, planNo
             <div>
               <p className="text-amber-300 text-sm font-medium">Plan {planNombre} — Marca bloqueada</p>
               <p className="text-amber-400/70 text-xs mt-0.5">
-                Configura tu marca aquí. Se activará automáticamente cuando mejores al plan Emprendedor o superior.
+                Configura tu marca aquí. Se activará automáticamente cuando mejores al plan Creador o superior.
               </p>
             </div>
           </div>

@@ -605,8 +605,8 @@ export default async function LandingPage() {
 
                     <div className="rounded-xl bg-gray-800/60 border border-gray-700/50 px-4 py-3 mb-5 text-center">
                       <p className="text-gray-500 text-xs mb-1">hasta</p>
-                      <p className={`text-2xl font-black ${colorAccent.num}`}>{plan.ebooksMes} PDFs</p>
-                      <p className="text-gray-500 text-xs mt-0.5">al mes (sin imágenes)</p>
+                      <p className={`text-2xl font-black ${colorAccent.num}`}>{plan.ebooksMes} ebooks</p>
+                      <p className="text-gray-500 text-xs mt-0.5">{plan.id === "gratis" ? "al mes para probar" : "al mes con imágenes"}</p>
                     </div>
 
                     <Link
