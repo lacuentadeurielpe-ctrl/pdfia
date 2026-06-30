@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
-  LayoutDashboard, FileText, Settings, LogOut, Sparkles, Clock, CreditCard
+  LayoutDashboard, FileText, Settings, LogOut, Sparkles, Clock, CreditCard, UserCircle
 } from "lucide-react";
 
 const NAV = [
@@ -12,6 +12,7 @@ const NAV = [
   { href: "/historial",  label: "Historial",    icon: Clock },
   { href: "/planes",     label: "Planes",       icon: CreditCard },
   { href: "/ajustes",    label: "Ajustes",      icon: Settings },
+  { href: "/perfil",     label: "Mi cuenta",    icon: UserCircle },
 ];
 
 interface Props {
@@ -25,10 +26,9 @@ interface Props {
 }
 
 const PLAN_COLOR: Record<string, string> = {
-  gratis:      "bg-gray-700 text-gray-300",
-  emprendedor: "bg-indigo-600/20 text-indigo-300",
-  profesional: "bg-purple-600/20 text-purple-300",
-  agencia:     "bg-amber-600/20 text-amber-300",
+  gratis:   "bg-gray-700 text-gray-300",
+  creador:  "bg-purple-600/20 text-purple-300",
+  estudio:  "bg-amber-600/20 text-amber-300",
 };
 
 export default function Sidebar({
