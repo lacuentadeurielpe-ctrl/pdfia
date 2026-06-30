@@ -4,7 +4,7 @@
 // ════════════════════════════════════════════════════════════════════
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPlan, PLAN_DEV_UNLOCKED, DEV_UNLOCK_ALL, type PlanId, type PlanInterno } from "./config";
+import { getPlan, PLAN_DEV_UNLOCKED, PLANES, DEV_UNLOCK_ALL, type PlanId, type PlanInterno } from "./config";
 
 export interface Suscripcion {
   user_id:          string;
@@ -154,10 +154,10 @@ export async function descontarCreditos(userId: string, cantidad: number): Promi
  */
 export async function cambiarPlan(userId: string, nuevoPlan: PlanId): Promise<void> {
   const admin = createAdminClient();
-  const plan = getPlan(nuevoPlan);
+  // getPlan con DEV_UNLOCK_ALL=false devuelve el plan real del catálogo
+  const plan = PLANES[nuevoPlan] ?? PLANES.gratis;
   const ahora = new Date();
   const fin = new Date(ahora.getTime() + 30 * 24 * 60 * 60 * 1000);
-  // upsert por si aún no tiene suscripción
   await admin
     .from("suscripciones")
     .upsert({
@@ -167,6 +167,8 @@ export async function cambiarPlan(userId: string, nuevoPlan: PlanId): Promise<vo
       creditos_usados:  0,
       ciclo_inicio:     ahora.toISOString(),
       ciclo_fin:        fin.toISOString(),
+      origen:           "pago",
+      ilimitado:        false,   // un pago real desactiva el ilimitado manual
       updated_at:       ahora.toISOString(),
     }, { onConflict: "user_id" });
 }

@@ -20,7 +20,9 @@ export async function crearPreferencia(input: PreferenciaInput) {
   const client = getClient();
   const preference = new Preference(client);
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://foxpdf.cloud";
+  // Usar var de servidor dedicada o fallback al dominio de producción.
+  // Nunca usar NEXT_PUBLIC_APP_URL aquí — puede estar mal seteada en Vercel.
+  const baseUrl = process.env.FOXPDF_URL ?? "https://foxpdf.cloud";
 
   const result = await preference.create({
     body: {

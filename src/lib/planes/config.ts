@@ -95,7 +95,7 @@ export const PLANES: Record<PlanId, PlanInterno> = {
 
 // ── DEV UNLOCK ──────────────────────────────────────────────────────
 // Pon a false cuando quieras volver a conectar los planes reales.
-export const DEV_UNLOCK_ALL = true;
+export const DEV_UNLOCK_ALL = false;
 
 // Plan con todo desbloqueado — usado por DEV_UNLOCK_ALL y por usuarios "ilimitado" del admin.
 export const PLAN_DEV_UNLOCKED: PlanInterno = {
